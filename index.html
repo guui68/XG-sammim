@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>XG Sammim Downloader</title>
+  <style>
+    body {
+      background: linear-gradient(to right, #4b0082, #8a2be2);
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
+      padding-top: 50px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      width: 80%;
+      max-width: 400px;
+      margin: 10px;
+      border-radius: 10px;
+      border: none;
+    }
+    .social {
+      margin-top: 40px;
+    }
+    .social a {
+      margin: 0 10px;
+      color: white;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>XG Sammim Downloader</h1>
+
+  <input type="text" id="tiktok" placeholder="TikTok ভিডিও লিংক দিন">
+  <br>
+  <button onclick="downloadTikTok()">Download TikTok</button>
+
+  <br><br>
+  <input type="text" id="youtube" placeholder="YouTube ভিডিও লিংক দিন">
+  <br>
+  <button onclick="downloadYouTube()">Download YouTube</button>
+
+  <br><br>
+  <input type="text" id="terabox" placeholder="TeraBox লিংক দিন">
+  <br>
+  <button onclick="downloadTeraBox()">Download TeraBox</button>
+
+  <div class="social">
+    <p>Follow us on:</p>
+    <a href="https://t.me/sammim14" target="_blank">Telegram</a>
+    <a href="https://www.facebook.com/share/1SD3SzGTyj/" target="_blank">Facebook</a>
+  </div>
+
+  <script>
+    function downloadTikTok() {
+      let url = document.getElementById("tiktok").value;
+      window.open(`https://ssstik.io/en?url=${encodeURIComponent(url)}`, "_blank");
+    }
+
+    function downloadYouTube() {
+      let url = document.getElementById("youtube").value;
+      window.open(`https://ytloader.app/en/?url=${encodeURIComponent(url)}`, "_blank");
+    }
+
+    function downloadTeraBox() {
+      let url = document.getElementById("terabox").value;
+      window.open(`https://terabox.app/en?url=${encodeURIComponent(url)}`, "_blank");
+    }
+  </script>
+</body>
+</html>
