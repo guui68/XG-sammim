@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XG Sammim TikTok Downloader</title>
+  <style>
+    body { font-family: Arial; text-align: center; background: #f0f0f0; padding: 20px; }
+    input, button { padding: 10px; font-size: 16px; margin-top: 10px; width: 80%; max-width: 400px; }
+    iframe { margin-top: 20px; width: 90%; height: 300px; border: none; }
+  </style>
+</head>
+<body>
+  <h2>XG Sammim TikTok Downloader</h2>
+  <p>টিকটক ভিডিও লিংক পেস্ট করো:</p>
+  <input id="videoUrl" type="text" placeholder="https://www.tiktok.com/@user/video/1234567890">
+  <br>
+  <button onclick="getDownload()">ডাউনলোড করো (No Watermark)</button>
+
+  <div id="result"></div>
+
+  <script>
+    function getDownload() {
+      const url = document.getElementById("videoUrl").value.trim();
+      if (!url) {
+        alert("দয়া করে একটি TikTok ভিডিও লিংক দিন!");
+        return;
+      }
+
+      fetch(`https://tikwm.com/api/?url=${encodeURIComponent(url)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.data && data.data.play) {
+            document.getElementById("result").innerHTML =
+              `<p>ডাউনলোড লিংক:</p>
+               <a href="${data.data.play}" download>এখানে ক্লিক করে ডাউনলোড করুন</a><br><br>
+               <video src="${data.data.play}" controls width="90%"></video>`;
+          } else {
+            document.getElementById("result").innerText = "কোনো ভিডিও পাওয়া যায়নি!";
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById("result").innerText = "সমস্যা হয়েছে, আবার চেষ্টা করুন!";
+        });
+    }
+  </script>
+</body>
+</html>
