@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>XG Sammim - TikTok Downloader</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f2f5;
+      text-align: center;
+      padding: 50px;
+    }
+    h2 {
+      color: #333;
+    }
+    input, button {
+      padding: 10px;
+      width: 90%;
+      max-width: 400px;
+      margin: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    #result {
+      margin-top: 20px;
+    }
+    a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>XG Sammim TikTok Video Downloader</h2>
+  <input id="link" type="text" placeholder="টিকটক ভিডিও লিংক পেস্ট করুন"/>
+  <br/>
+  <button onclick="downloadVideo()">ডাউনলোড করুন</button>
+  <p id="result"></p>
+
+  <script>
+    async function downloadVideo() {
+      const url = document.getElementById('link').value.trim();
+      const result = document.getElementById('result');
+
+      if (!url.includes('tiktok.com')) {
+        result.innerText = "দয়া করে সঠিক TikTok লিংক দিন!";
+        return;
+      }
+
+      result.innerText = "ভিডিও প্রসেস হচ্ছে...";
+
+      try {
+        const response = await fetch(`https://tikwm.com/api/?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+
+        if (data && data.data && data.data.play) {
+          result.innerHTML = `
+            <p>ভিডিও প্রস্তুত!</p>
+            <a href="${data.data.play}" download>এখানে ক্লিক করে ভিডিও ডাউনলোড করুন</a>
+          `;
+        } else {
+          result.innerText = "ভিডিও লিংক পাওয়া যায়নি!";
+        }
+      } catch (error) {
+        result.innerText = "ভুল হয়েছে! আবার চেষ্টা করুন।";
+      }
+    }
+  </script>
+</body>
+</html>
