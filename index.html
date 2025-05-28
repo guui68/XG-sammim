@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XG Sammim - TikTok Downloader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+            background-color: #000;
+            color: white;
+        }
+        img {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            width: 300px;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        button {
+            background-color: #ff0050;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <img src="logo.png" alt="XG Sammim Logo">
+    <h1>TikTok Video Downloader</h1>
+    <p>Paste your TikTok video URL below:</p>
+    <input type="text" id="urlInput" placeholder="https://www.tiktok.com/..."><br>
+    <button onclick="downloadVideo()">Download</button>
+    <div class="result" id="resultBox"></div>
+
+    <script>
+        function downloadVideo() {
+            const url = document.getElementById('urlInput').value;
+            if (!url.includes('tiktok.com')) {
+                alert('Please enter a valid TikTok URL');
+                return;
+            }
+            const api = `https://tikwm.com/api/?url=${encodeURIComponent(url)}`;
+            fetch(api)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.data && data.data.play) {
+                        document.getElementById('resultBox').innerHTML = `
+                            <video width="300" controls src="${data.data.play}"></video><br>
+                            <a href="${data.data.play}" download>Click here to download</a>
+                        `;
+                    } else {
+                        document.getElementById('resultBox').innerHTML = 'Failed to fetch video.';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('resultBox').innerHTML = 'Error fetching video.';
+                });
+        }
+    </script>
+</body>
+</html>
