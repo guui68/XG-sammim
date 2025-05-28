@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>XG Sammim TikTok Downloader</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Notice Section -->
+<div id="notice" style="display:none; background:#ffeb3b; color:#000; padding:10px; font-weight:bold;"></div>
+
+<!-- Maintenance Message -->
+<div id="maintenance" style="display:none;">
+  <h1>🛠 App Under Maintenance</h1>
+  <p>Please check back later.</p>
+</div>
+
+<!-- Login Section -->
+<div class="login-box" id="loginBox" style="display:none;">
+  <div class="avatar"></div>
+  <h2>Enter Password</h2>
+  <form onsubmit="return login(event)">
+    <div class="textbox">
+      <input type="password" id="password" placeholder="Password" required />
+    </div>
+    <div class="options">
+      <label><input type="checkbox" /> Remember me</label>
+    </div>
+    <button type="submit" class="login-btn">LOGIN</button>
+  </form>
+</div>
+
+<!-- TikTok Downloader Section -->
+<div class="container" id="mainContent" style="display:none;">
+  <h1>TikTok Video Downloader</h1>
+  <div class="input-box">
+    <input type="text" id="videoUrl" placeholder="Just insert a link">
+    <button class="paste-btn" onclick="pasteText()">Paste</button>
+  </div>
+  <br>
+  <button class="download-btn" onclick="downloadVideo()">Download</button>
+
+  <div class="creator">I created this app. Sammim</div>
+
+  <div class="contact-box">
+    <h3>Contact the app owner</h3>
+    <a href="https://t.me/sammim14" target="_blank">Telegram</a>
+    <a href="https://www.facebook.com/share/1SD3SzGTyj/" target="_blank">Facebook</a>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  // Handle all settings on page load
+  window.onload = function () {
+    const maintenance = localStorage.getItem("maintenance_mode") === "true";
+    const passwordEnabled = localStorage.getItem("password_enabled") === "true";
+    const noticeText = localStorage.getItem("app_notice") || "";
+    const appPassword = localStorage.getItem("app_password") || "xgsammim123";
+
+    if (noticeText) {
+      const noticeDiv = document.getElementById("notice");
+      noticeDiv.innerText = noticeText;
+      noticeDiv.style.display = "block";
+    }
+
+    if (maintenance) {
+      document.getElementById("maintenance").style.display = "block";
+      return;
+    }
+
+    if (passwordEnabled) {
+      window.APP_PASSWORD = appPassword;
+      document.getElementById("loginBox").style.display = "block";
+    } else {
+      document.getElementById("mainContent").style.display = "block";
+    }
+  };
+
+  function login(event) {
+    event.preventDefault();
+    const pass = document.getElementById("password").value;
+    if (pass === window.APP_PASSWORD) {
+      document.getElementById("loginBox").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+    } else {
+      alert("Invalid password!");
+    }
+  }
+</script>
+
+</body>
+</html>
