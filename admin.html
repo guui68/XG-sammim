@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - Password Toggle</title>
+  <style>
+    body {
+      background: #121212;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+    .box {
+      background: #1e1e1e;
+      padding: 40px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    label {
+      font-size: 18px;
+    }
+    input[type="checkbox"] {
+      transform: scale(1.5);
+      margin-left: 10px;
+    }
+    button {
+      margin-top: 30px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #4a00e0;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>🔐 Admin Panel</h2>
+    <label>
+      Enable Password:
+      <input type="checkbox" id="toggleSwitch">
+    </label>
+    <br>
+    <button onclick="saveToggle()">Save</button>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    const toggle = document.getElementById("toggleSwitch");
+    const statusText = document.getElementById("status");
+
+    // Load toggle value from localStorage
+    window.onload = () => {
+      const saved = localStorage.getItem("passwordEnabled");
+      if (saved === "true") toggle.checked = true;
+    };
+
+    function saveToggle() {
+      const value = toggle.checked;
+      localStorage.setItem("passwordEnabled", value);
+      statusText.innerText = "Saved! Reload client site.";
+    }
+  </script>
+</body>
+</html>
