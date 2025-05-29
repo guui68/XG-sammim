@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>XG Sammim TikTok Downloader</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #8e2de2, #4a00e0);
+      color: white;
+      text-align: center;
+    }
+    .container {
+      margin-top: 80px;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .input-box {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px;
+      display: inline-block;
+    }
+    input[type="text"] {
+      width: 250px;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      outline: none;
+    }
+    .paste-btn {
+      padding: 10px 16px;
+      background-color: white;
+      color: #4a00e0;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .download-btn {
+      margin-top: 20px;
+      padding: 12px 60px;
+      background: linear-gradient(to right, #e040fb, #7c4dff);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .creator {
+      margin-top: 30px;
+      font-size: 18px;
+    }
+    .contact-box {
+      margin-top: 40px;
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+    .contact-box h3 {
+      margin-bottom: 20px;
+      font-size: 20px;
+      text-shadow: 1px 1px 2px black;
+    }
+    .contact-box a {
+      display: block;
+      margin: 10px 0;
+      background: #d1c4e9;
+      color: #000;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>TikTok Video Downloader</h1>
+    <div class="input-box">
+      <input type="text" id="videoUrl" placeholder="Just insert a link">
+      <button class="paste-btn" onclick="pasteText()">Paste</button>
+    </div>
+    <br>
+    <button class="download-btn" onclick="downloadVideo()">Download</button>
+
+    <div class="creator">I created this app. Sammim</div>
+
+    <div class="contact-box">
+      <h3>Contact the app owner</h3>
+      <a href="https://t.me/sammim14" target="_blank">telegram</a>
+      <a href="https://www.facebook.com/share/1SD3SzGTyj/" target="_blank">Facebook</a>
+    </div>
+  </div>
+
+  <script>
+    async function downloadVideo() {
+      const url = document.getElementById("videoUrl").value;
+      if (!url) return alert("Please insert a TikTok link.");
+
+      try {
+        const response = await fetch(`https://tikwm.com/api/?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+        if (data.data && data.data.play) {
+          window.open(data.data.play, '_blank');
+        } else {
+          alert("Download failed. Please try another link.");
+        }
+      } catch (err) {
+        alert("Something went wrong. Please try again later.");
+      }
+    }
+
+    function pasteText() {
+      navigator.clipboard.readText().then(text => {
+        document.getElementById("videoUrl").value = text;
+      }).catch(() => {
+        alert("Clipboard access denied. Please paste manually.");
+      });
+    }
+  </script>
+</body>
+</html>
