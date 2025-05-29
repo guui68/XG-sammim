@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 50px; background: #102a43; color: white; }
+    input, select, button { margin: 8px; padding: 10px; font-size: 16px; width: 80%; max-width: 300px; }
+    .box { background: #243b55; padding: 20px; border-radius: 8px; display: inline-block; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>🔐 Admin Panel</h2>
+    <input type="password" id="adminPass" placeholder="Admin Password">
+    <button onclick="verify()">Access</button>
+
+    <div id="panel" style="display:none;">
+      <select id="pwEnable">
+        <option value="true">Password ON</option>
+        <option value="false">Password OFF</option>
+      </select><br>
+      <input type="text" id="appPass" placeholder="App Password"><br>
+      <input type="text" id="notice" placeholder="Notice Text"><br>
+      <select id="maintain">
+        <option value="true">Maintenance ON</option>
+        <option value="false">Maintenance OFF</option>
+      </select><br>
+      <button onclick="save()">💾 Save Settings</button>
+    </div>
+  </div>
+<script>
+  const api = "https://xg-remote-settings.vercel.app/settings.json";
+  const adminPassword = "admin123";
+
+  async function verify() {
+    const input = document.getElementById("adminPass").value;
+    if (input !== adminPassword) return alert("❌ Wrong Admin Password");
+    const res = await fetch(api);
+    const data = await res.json();
+    document.getElementById("pwEnable").value = data.password_enabled;
+    document.getElementById("appPass").value = data.app_password;
+    document.getElementById("notice").value = data.app_notice;
+    document.getElementById("maintain").value = data.maintenance_mode;
+    document.getElementById("panel").style.display = "block";
+  }
+
+  function save() {
+    alert("⚠️ Demo: Connect PUT method here to save to GitHub API or use Firebase.");
+  }
+</script>
+</body>
+</html>

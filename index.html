@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>XG Downloader</title>
+  <style>
+    body {
+      background-color: #101820;
+      color: white;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      padding-top: 50px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h1>XG Sammim TikTok Downloader</h1>
+  <div id="noticeBox"></div>
+  <div id="maintenance" style="display:none;"><h2>🚧 App Under Maintenance</h2></div>
+  <div id="loginBox" style="display:none;">
+    <input type="password" id="passwordInput" placeholder="Enter App Password">
+    <button onclick="login()">LOGIN</button>
+  </div>
+  <div id="mainApp" style="display:none;">
+    <input type="text" id="url" placeholder="Paste TikTok link">
+    <button onclick="alert('Pretend downloading...')">Download</button>
+  </div>
+<script>
+  const api = "https://xg-remote-settings.vercel.app/settings.json";
+  async function load() {
+    const res = await fetch(api);
+    const data = await res.json();
+    if (data.app_notice) alert("📢 NOTICE: " + data.app_notice);
+    if (data.maintenance_mode) {
+      document.getElementById("maintenance").style.display = "block";
+      return;
+    }
+    if (data.password_enabled) {
+      window._appPass = data.app_password;
+      document.getElementById("loginBox").style.display = "block";
+    } else {
+      document.getElementById("mainApp").style.display = "block";
+    }
+  }
+  function login() {
+    const pass = document.getElementById("passwordInput").value;
+    if (pass === window._appPass) {
+      document.getElementById("loginBox").style.display = "none";
+      document.getElementById("mainApp").style.display = "block";
+    } else {
+      alert("❌ Wrong password!");
+    }
+  }
+  load();
+</script>
+</body>
+</html>
