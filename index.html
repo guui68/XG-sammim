@@ -13,11 +13,81 @@
       color: white;
       text-align: center;
     }
+    .container {
+      margin-top: 80px;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 2px black;
+    }
+    .input-box {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px;
+      display: inline-block;
+    }
+    input[type="text"] {
+      width: 250px;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      outline: none;
+    }
+    .paste-btn {
+      padding: 10px 16px;
+      background-color: white;
+      color: #4a00e0;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .download-btn {
+      margin-top: 20px;
+      padding: 12px 60px;
+      background: linear-gradient(to right, #e040fb, #7c4dff);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .creator {
+      margin-top: 30px;
+      font-size: 18px;
+    }
+    .contact-box {
+      margin-top: 40px;
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+    .contact-box h3 {
+      margin-bottom: 20px;
+      font-size: 20px;
+      text-shadow: 1px 1px 2px black;
+    }
+    .contact-box a {
+      display: block;
+      margin: 10px 0;
+      background: #d1c4e9;
+      color: #000;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+
+    /* Password Screen */
     .password-screen {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85);
+      background: rgba(0,0,0,0.95);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -29,14 +99,14 @@
       color: #000;
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 0 10px #000;
+      box-shadow: 0 0 15px #000;
     }
     .password-box h2 {
       margin-bottom: 20px;
     }
     .password-box input {
       padding: 10px;
-      width: 200px;
+      width: 220px;
       font-size: 16px;
       margin-bottom: 10px;
     }
@@ -58,6 +128,7 @@
 </head>
 <body>
 
+  <!-- Password Protection -->
   <div class="password-screen" id="passwordScreen">
     <div class="password-box">
       <h2>Enter Password</h2>
@@ -68,6 +139,7 @@
     </div>
   </div>
 
+  <!-- Main Content -->
   <div class="container" style="display:none;" id="mainContent">
     <h1>TikTok Video Downloader</h1>
     <div class="input-box">
