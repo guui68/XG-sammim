@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>XG Admin Panel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      text-align: center;
+      padding-top: 60px;
+    }
+    .container {
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 12px;
+      display: inline-block;
+      width: 90%;
+      max-width: 400px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+    }
+    .off { background-color: #f44336; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🔐 Admin Panel</h2>
+    <input type="password" id="adminPass" placeholder="Enter Admin Password">
+    <button onclick="verify()">Access Panel</button>
+
+    <div id="controls" style="display:none;">
+      <h3>Controls</h3>
+      <label>Password System: 
+        <select id="passwordEnabled">
+          <option value="true">Enabled</option>
+          <option value="false">Disabled</option>
+        </select>
+      </label><br/>
+      <label>App Password: <input type="text" id="appPassword"></label><br/>
+      <label>Notice: <input type="text" id="appNotice"></label><br/>
+      <label>Maintenance Mode: 
+        <select id="maintenanceMode">
+          <option value="true">Enabled</option>
+          <option value="false">Disabled</option>
+        </select>
+      </label><br/>
+      <button onclick="save()">💾 Save</button>
+    </div>
+  </div>
+
+  <script>
+    const api = "https://xg-remote-settings.vercel.app/settings.json";
+    const adminPassword = "admin123";
+
+    async function verify() {
+      const input = document.getElementById("adminPass").value;
+      if (input === adminPassword) {
+        const res = await fetch(api);
+        const data = await res.json();
+        document.getElementById("passwordEnabled").value = data.password_enabled.toString();
+        document.getElementById("appPassword").value = data.app_password;
+        document.getElementById("appNotice").value = data.app_notice;
+        document.getElementById("maintenanceMode").value = data.maintenance_mode.toString();
+        document.getElementById("controls").style.display = "block";
+      } else {
+        alert("❌ Wrong Password");
+      }
+    }
+
+    function save() {
+      alert("⚠️ Demo panel cannot save. Replace with real PUT method using backend.");
+    }
+  </script>
+</body>
+</html>
