@@ -54,6 +54,17 @@
       font-weight: bold;
       cursor: pointer;
     }
+    .go-site-btn {
+      margin-top: 30px;
+      padding: 12px 40px;
+      background: linear-gradient(to right, #00c853, #64dd17);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
     .creator {
       margin-top: 30px;
       font-size: 18px;
@@ -94,6 +105,9 @@
 
     <div class="creator">I created this app. Sammim</div>
 
+    <!-- সবুজ বাটন -->
+    <button class="go-site-btn" onclick="goToAnotherPage()">Our new site</button>
+
     <div class="contact-box">
       <h3>Contact the app owner</h3>
       <a href="https://t.me/sammim14" target="_blank">telegram</a>
@@ -125,6 +139,10 @@
       }).catch(() => {
         alert("Clipboard access denied. Please paste manually.");
       });
+    }
+
+    function goToAnotherPage() {
+      window.location.href = "https://guui68.github.io/XG-sammim/";
     }
   </script>
 </body>
