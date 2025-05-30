@@ -1,0 +1,87 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  background: #0073e6;
+  color: white;
+  text-align: center;
+}
+header {
+  background: white;
+  color: #000;
+  padding: 10px;
+  font-size: 24px;
+  font-weight: bold;
+}
+header span {
+  color: #00bfff;
+}
+.container {
+  margin: 40px 20px;
+}
+.box {
+  background-color: #0055cc;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+.box h2 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+.box p {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+input[type="text"] {
+  width: 70%;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+}
+.paste-btn {
+  margin-left: 8px;
+  padding: 10px;
+  background: #fff;
+  color: #0073e6;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.download-btn {
+  margin-top: 20px;
+  padding: 12px 50px;
+  background: #00cc66;
+  border: none;
+  color: white;
+  font-size: 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.contact-box {
+  background-color: #0047a0;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+.contact-box h3 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: #ffb6c1;
+  text-shadow: 1px 1px 2px black;
+}
+.contact-box a {
+  display: block;
+  margin: 10px auto;
+  width: 60%;
+  padding: 12px;
+  background: #0066ff;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 10px;
+}
