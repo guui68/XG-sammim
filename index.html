@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Secure Lock</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/otplib/12.0.1/otplib-browser.all.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body {
+            background: #0f172a;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        .login-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .icon { font-size: 50px; margin-bottom: 20px; }
+        h2 { font-weight: 600; margin-bottom: 8px; letter-spacing: 1px; }
+        p { color: #94a3b8; font-size: 14px; margin-bottom: 30px; }
+        input {
+            width: 100%;
+            padding: 15px;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 12px;
+            color: #38bdf8;
+            font-size: 28px;
+            letter-spacing: 12px;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.2); }
+        .status { margin-top: 20px; font-size: 14px; height: 20px; }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <div class="icon">🔒</div>
+    <h2>সিস্টেম লক</h2>
+    <p>আপনার ফোনের অথেন্টিকেটর অ্যাপ থেকে কোডটি দিন</p>
+    
+    <input type="text" id="otpCode" maxlength="6" placeholder="000000" autocomplete="off" autofocus>
+    
+    <div id="statusMessage" class="status"></div>
+</div>
+
+<script>
+    // --- সেটিংস ---
+    const secret = 'JBSWY3DPEHPK3PXP'; // আপনার অ্যাপে এই কি-টি সেভ করবেন
+    const redirectUrl = 'https://google.com'; // কোড সঠিক হলে যেখানে যাবে (আপনার লিংক দিন)
+
+    const input = document.getElementById('otpCode');
+    const status = document.getElementById('statusMessage');
+
+    input.addEventListener('input', () => {
+        const code = input.value;
+        if (code.length === 6) {
+            verify(code);
+        }
+    });
+
+    function verify(userCode) {
+        // otplib ব্যবহার করে কোড যাচাই
+        const isValid = otplib.authenticator.check(userCode, secret);
+
+        if (isValid) {
+            status.innerHTML = '<span class="success">✔ সফল হয়েছে! আনলক হচ্ছে...</span>';
+            input.style.borderColor = '#4ade80';
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 1000);
+        } else {
+            status.innerHTML = '<span class="error">✘ ভুল কোড, আবার চেষ্টা করুন</span>';
+            input.style.borderColor = '#f87171';
+            setTimeout(() => {
+                input.value = '';
+                input.style.borderColor = '#334155';
+                status.innerHTML = '';
+            }, 1000);
+        }
+    }
+</script>
+
+</body>
+</html>
