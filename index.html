@@ -1,120 +1,142 @@
-      <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বিলিং প্রো - আল্ট্রা প্রিমিয়াম</title>
+    <title>বিলিং প্রো - কাস্টম মেনু</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .glass { background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.05); }
-        .modal { display: none; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
+        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .modal { display: none; position: fixed; inset: 0; z-index: 50; align-items: center; justify-content: center; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); }
         .active-modal { display: flex; }
-        .tab-btn { transition: 0.3s; color: #444; font-size: 13px; font-weight: 700; border-radius: 12px; }
-        .tab-btn.active { color: #fff; background: #1a1a1a; }
-        .user-card { transition: 0.3s; border-radius: 20px; border: 1px solid #111; }
-        .user-card:active { transform: scale(0.95); background: #0a0a0a; }
-        #deleteBar { display: none; position: fixed; top: 0; left: 0; width: 100%; background: #ef4444; padding: 15px; z-index: 100; justify-content: space-between; align-items: center; animation: slideDown 0.3s; }
-        @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+        .user-card { transition: 0.2s; border-bottom: 1px solid #111; cursor: pointer; }
+        .user-card:active { background: #0a0a0a; }
+        .tab-btn { transition: 0.3s; color: #444; font-size: 13px; font-weight: 700; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: #fff; border-bottom: 2px solid #3b82f6; }
     </style>
 </head>
 <body class="p-4">
 
-    <div id="deleteBar">
-        <span class="font-bold">ইউজার সিলেক্ট করা হয়েছে</span>
-        <div class="flex gap-4">
-            <button id="confirmDelete" class="bg-white text-red-600 px-4 py-1 rounded-lg font-black text-xs uppercase">মুছে ফেলুন</button>
-            <button onclick="hideDeleteBar()" class="text-white font-bold">বাতিল</button>
-        </div>
-    </div>
-
     <div class="max-w-md mx-auto">
-        <div class="flex justify-between items-center mb-8 mt-4">
-            <h1 class="text-xl font-black tracking-tighter italic">BILLING<span class="text-blue-600">PRO</span></h1>
-            <button onclick="openAddModal()" class="w-10 h-10 bg-white text-black rounded-full font-bold text-xl">+</button>
+        <div class="flex justify-between items-center mb-8 pt-4 px-2">
+            <h1 class="text-xl font-black italic tracking-tighter">BILLING<span class="text-blue-600">PRO</span></h1>
+            <button onclick="openAddModal()" class="w-10 h-10 bg-white text-black rounded-full font-bold text-2xl">+</button>
         </div>
 
         <div class="grid grid-cols-3 gap-3 mb-8">
-            <div class="glass p-4 rounded-[2rem] text-center border-b-2 border-blue-600">
-                <p class="text-[8px] text-gray-500 uppercase font-bold">Total</p>
+            <div class="bg-[#0a0a0a] p-4 rounded-3xl text-center border border-gray-900">
+                <p class="text-[8px] text-gray-500 uppercase font-black">Total</p>
                 <h2 id="totalCount" class="text-xl font-bold">0</h2>
             </div>
-            <div class="glass p-4 rounded-[2rem] text-center border-b-2 border-emerald-500">
-                <p class="text-[8px] text-emerald-500 uppercase font-bold">Paid</p>
-                <h2 id="paidCount" class="text-xl font-bold">0</h2>
+            <div class="bg-[#0a0a0a] p-4 rounded-3xl text-center border border-gray-900">
+                <p class="text-[8px] text-emerald-500 uppercase font-black">Paid</p>
+                <h2 id="paidCount" class="text-xl font-bold text-emerald-500">0</h2>
             </div>
-            <div class="glass p-4 rounded-[2rem] text-center border-b-2 border-rose-600">
-                <p class="text-[8px] text-rose-500 uppercase font-bold">Due</p>
-                <h2 id="dueCount" class="text-xl font-bold">0</h2>
+            <div class="bg-[#0a0a0a] p-4 rounded-3xl text-center border border-gray-900">
+                <p class="text-[8px] text-rose-500 uppercase font-black">Due</p>
+                <h2 id="dueCount" class="text-xl font-bold text-rose-500">0</h2>
             </div>
         </div>
 
-        <input type="text" id="search" onkeyup="renderData()" placeholder="আইডি বা নাম খুঁজুন..." 
-               class="w-full bg-[#0a0a0a] border border-gray-900 p-4 rounded-2xl outline-none mb-6 text-sm focus:border-gray-700 transition-all">
-
-        <div class="flex bg-[#0a0a0a] p-1 rounded-2xl mb-8 border border-gray-900">
-            <button onclick="switchTab('all')" id="tab-all" class="tab-btn active flex-1 py-3">সবাই</button>
-            <button onclick="switchTab('due')" id="tab-due" class="tab-btn flex-1 py-3">বাকি</button>
-            <button onclick="switchTab('paid')" id="tab-paid" class="tab-btn flex-1 py-3">পেইড</button>
+        <div class="flex gap-8 mb-6 px-2 border-b border-gray-900">
+            <button onclick="switchTab('all')" id="tab-all" class="tab-btn active pb-3">সবাই</button>
+            <button onclick="switchTab('due')" id="tab-due" class="tab-btn pb-3">বাকি</button>
+            <button onclick="switchTab('paid')" id="tab-paid" class="tab-btn pb-3">পেইড</button>
         </div>
 
-        <div id="userList" class="space-y-3 pb-24"></div>
+        <div id="userList" class="space-y-1 pb-24"></div>
     </div>
 
-    <div id="userModal" class="modal fixed inset-0 z-50 p-6">
-        <div class="bg-[#0a0a0a] w-full max-w-sm p-8 rounded-[3rem] border border-gray-800">
-            <h3 id="modalTitle" class="text-xl font-bold mb-8 text-center text-blue-500">ইউজার ডাটা</h3>
+    <div id="actionModal" class="modal">
+        <div class="bg-[#0a0a0a] w-[85%] max-w-xs p-6 rounded-[2.5rem] border border-gray-800 shadow-2xl">
+            <button onclick="confirmDeleteUser()" class="w-full bg-rose-950/20 text-rose-500 p-4 rounded-2xl font-bold text-xs uppercase mb-6 border border-rose-900/30">
+                🗑 ইউজার ডিলিট (Delete)
+            </button>
+            
+            <div class="space-y-3">
+                <button id="statusActionBtn" onclick="handleStatusToggle()" class="w-full bg-emerald-600 text-white p-4 rounded-2xl font-bold text-sm">
+                    বিল সাকসেস (Success)
+                </button>
+                <button onclick="handleEditClick()" class="w-full bg-gray-900 text-white p-4 rounded-2xl font-bold text-sm border border-gray-800">
+                    এডিট ইউজার (Edit)
+                </button>
+                <button onclick="closeActionModal()" class="w-full p-2 text-gray-600 text-[10px] font-bold uppercase mt-2">ফিরে যান</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="dataModal" class="modal">
+        <div class="bg-[#0a0a0a] w-[90%] max-w-sm p-8 rounded-[3rem] border border-gray-800">
+            <h3 id="modalTitle" class="text-lg font-bold mb-8 text-center text-blue-500 italic">USER INFO</h3>
             <input type="hidden" id="editId">
-            <div class="space-y-5">
+            <div class="space-y-4">
                 <input type="text" id="userName" placeholder="নাম" class="w-full p-4 bg-black border border-gray-800 rounded-2xl outline-none">
-                <input type="number" id="userAmount" placeholder="টাকার পরিমাণ" class="w-full p-4 bg-black border border-gray-800 rounded-2xl outline-none">
-                <div class="flex gap-4 pt-4">
-                    <button onclick="handleFormSubmit()" class="flex-1 bg-blue-600 p-4 rounded-2xl font-bold">সেভ করুন</button>
-                    <button onclick="closeModal()" class="flex-1 bg-gray-900 p-4 rounded-2xl font-bold text-gray-500">বন্ধ</button>
-                </div>
-                <div id="paidActions" class="hidden flex gap-4">
-                    <button id="btnMarkDue" class="flex-1 bg-rose-900/50 text-rose-500 p-4 rounded-2xl font-bold text-xs uppercase">আবার বাকি করুন</button>
-                </div>
+                <input type="number" id="userAmount" placeholder="টাকা" class="w-full p-4 bg-black border border-gray-800 rounded-2xl outline-none">
+                <button onclick="saveUser()" class="w-full bg-white text-black p-4 rounded-2xl font-bold mt-4">সেভ করুন</button>
+                <button onclick="closeDataModal()" class="w-full text-gray-600 font-bold text-xs mt-2 uppercase">বাতিল</button>
             </div>
         </div>
     </div>
 
     <script>
-        let users = JSON.parse(localStorage.getItem('ultraBillingDB')) || [];
+        let users = JSON.parse(localStorage.getItem('billingFinalV6')) || [];
         let currentTab = 'all';
-        let holdTimer;
-        let selectedUserId = null;
+        let activeUserId = null;
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-'+tab).classList.add('active');
+            renderData();
+        }
+
+        // ইউজার কার্ডে ক্লিক করলে যা হবে
+        function handleUserClick(id, isPaid) {
+            // যদি পেইড (টাকা দিছে) হয়, তবে কোনো মেনু আসবে না
+            if (isPaid) return; 
+            
+            // অন্যথায় মেনু ওপেন হবে
+            activeUserId = id;
+            document.getElementById('actionModal').classList.add('active-modal');
+        }
+
+        function closeActionModal() { document.getElementById('actionModal').classList.remove('active-modal'); }
+
+        function handleStatusToggle() {
+            users = users.map(u => u.id === activeUserId ? {...u, isPaid: true} : u);
+            saveAndRender();
+            closeActionModal();
+        }
+
+        function handleEditClick() {
+            const user = users.find(u => u.id === activeUserId);
+            document.getElementById('editId').value = user.id;
+            document.getElementById('userName').value = user.name;
+            document.getElementById('userAmount').value = user.amount;
+            document.getElementById('modalTitle').innerText = "EDIT USER";
+            closeActionModal();
+            document.getElementById('dataModal').classList.add('active-modal');
+        }
+
+        function confirmDeleteUser() {
+            if(confirm("ডিলিট করতে চান?")) {
+                users = users.filter(u => u.id !== activeUserId);
+                saveAndRender();
+                closeActionModal();
+            }
+        }
 
         function openAddModal() {
             document.getElementById('editId').value = "";
             document.getElementById('userName').value = "";
             document.getElementById('userAmount').value = "";
-            document.getElementById('modalTitle').innerText = "নতুন এন্ট্রি";
-            document.getElementById('paidActions').classList.add('hidden');
-            document.getElementById('userModal').classList.add('active-modal');
+            document.getElementById('modalTitle').innerText = "NEW USER";
+            document.getElementById('dataModal').classList.add('active-modal');
         }
 
-        function openEditModal(id) {
-            const user = users.find(u => u.id === id);
-            document.getElementById('editId').value = user.id;
-            document.getElementById('userName').value = user.name;
-            document.getElementById('userAmount').value = user.amount;
-            document.getElementById('modalTitle').innerText = "তথ্য পরিবর্তন";
-            
-            // পেইড লিস্টে থাকলে বাকি করার অপশন দেখাবে
-            if(user.isPaid) {
-                document.getElementById('paidActions').classList.remove('hidden');
-                document.getElementById('btnMarkDue').onclick = () => { toggleStatus(id); closeModal(); };
-            } else {
-                document.getElementById('paidActions').classList.add('hidden');
-            }
-            
-            document.getElementById('userModal').classList.add('active-modal');
-        }
+        function closeDataModal() { document.getElementById('dataModal').classList.remove('active-modal'); }
 
-        function closeModal() { document.getElementById('userModal').classList.remove('active-modal'); }
-
-        function handleFormSubmit() {
+        function saveUser() {
             const id = document.getElementById('editId').value;
             const name = document.getElementById('userName').value.trim();
             const amount = document.getElementById('userAmount').value.trim();
@@ -126,83 +148,31 @@
                 users.unshift({ id: Date.now(), name, amount, isPaid: false });
             }
             saveAndRender();
-            closeModal();
-        }
-
-        // লং প্রেস লজিক
-        function onTouchStart(id) {
-            selectedUserId = id;
-            holdTimer = setTimeout(() => {
-                const user = users.find(u => u.id === id);
-                if (currentTab === 'paid') {
-                    // পেইড লিস্টে লং প্রেস করলে এডিট মোডাল খুলবে
-                    openEditModal(id);
-                } else if (currentTab === 'due') {
-                    // বাকি লিস্টে লং প্রেস করলে সাকসেস হবে
-                    toggleStatus(id);
-                    if ('vibrate' in navigator) navigator.vibrate(100);
-                } else {
-                    // অল ইউজার লিস্টে লং প্রেস করলে ডিলিট বার আসবে
-                    showDeleteBar(id);
-                }
-            }, 800);
-        }
-
-        function onTouchEnd() { clearTimeout(holdTimer); }
-
-        function showDeleteBar(id) {
-            document.getElementById('deleteBar').style.display = 'flex';
-            document.getElementById('confirmDelete').onclick = () => {
-                users = users.filter(u => u.id !== id);
-                saveAndRender();
-                hideDeleteBar();
-            };
-        }
-
-        function hideDeleteBar() { document.getElementById('deleteBar').style.display = 'none'; }
-
-        function toggleStatus(id) {
-            users = users.map(u => u.id === id ? {...u, isPaid: !u.isPaid} : u);
-            saveAndRender();
-        }
-
-        function switchTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-'+tab).classList.add('active');
-            renderData();
+            closeDataModal();
         }
 
         function saveAndRender() {
-            localStorage.setItem('ultraBillingDB', JSON.stringify(users));
+            localStorage.setItem('billingFinalV6', JSON.stringify(users));
             renderData();
         }
 
         function renderData() {
             const list = document.getElementById('userList');
-            const searchVal = document.getElementById('search').value.toLowerCase();
             list.innerHTML = '';
 
-            let filtered = users.filter(u => u.name.toLowerCase().includes(searchVal));
-            if (currentTab === 'due') filtered = filtered.filter(u => !u.isPaid);
-            if (currentTab === 'paid') filtered = filtered.filter(u => u.isPaid);
+            let filtered = users;
+            if (currentTab === 'due') filtered = users.filter(u => !u.isPaid);
+            if (currentTab === 'paid') filtered = users.filter(u => u.isPaid);
 
             filtered.forEach(u => {
-                const statusInfo = u.isPaid ? `<span class="text-[9px] text-emerald-500 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full uppercase">Success</span>` : '';
-                
                 list.innerHTML += `
-                    <div class="user-card p-5 flex justify-between items-center bg-[#050505]"
-                         onmousedown="onTouchStart(${u.id})" onmouseup="onTouchEnd()" 
-                         ontouchstart="onTouchStart(${u.id})" ontouchend="onTouchEnd()">
+                    <div onclick="handleUserClick(${u.id}, ${u.isPaid})" class="user-card p-5 flex justify-between items-center">
                         <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <h4 class="font-bold text-sm ${u.isPaid ? 'text-gray-600 line-through' : ''}">${u.name}</h4>
-                                ${statusInfo}
-                            </div>
-                            <p class="text-[11px] text-gray-500 font-bold">${u.amount} TK</p>
+                            <h4 class="font-bold text-[15px] ${u.isPaid ? 'text-gray-600 line-through' : 'text-white'}">${u.name}</h4>
+                            <p class="text-[10px] text-gray-500 font-black tracking-widest">${u.amount} TK</p>
                         </div>
-                        <div class="text-gray-800 text-[10px] font-bold uppercase tracking-widest">
-                            ${u.isPaid ? 'Paid' : 'Due'}
+                        <div class="text-[9px] font-black uppercase tracking-widest ${u.isPaid ? 'text-emerald-500' : 'text-rose-600'}">
+                            ${u.isPaid ? 'Success' : 'Due'}
                         </div>
                     </div>
                 `;
@@ -217,4 +187,3 @@
     </script>
 </body>
 </html>
-              
