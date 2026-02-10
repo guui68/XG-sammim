@@ -3,23 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বিলিং প্রো - অটো টেলিগ্রাম</title>
+    <title>ListerPro - Report Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
         .modal { display: none; position: fixed; inset: 0; z-index: 50; align-items: center; justify-content: center; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); }
         .active-modal { display: flex; }
         .user-card { transition: 0.3s; border: 1px solid #111; position: relative; overflow: hidden; background: #050505; border-radius: 20px; }
-        .user-card:active { transform: scale(0.98); background: #0a0a0a; }
-        
-        /* ইউজারের নাম সাদা */
-        .user-name-text { 
-            color: #ffffff !important; 
-            font-weight: 700;
-            font-size: 19px;
-            letter-spacing: -0.5px;
-        }
-
+        .user-name-text { color: #ffffff !important; font-weight: 700; font-size: 19px; }
         .success-tag { position: absolute; top: 0; right: 0; background: #10b981; color: #000; font-size: 8px; font-weight: 900; padding: 3px 10px; border-bottom-left-radius: 12px; text-transform: uppercase; }
         .tab-btn { transition: 0.3s; color: #444; font-size: 13px; font-weight: 700; border-bottom: 2px solid transparent; }
         .tab-btn.active { color: #3b82f6; border-bottom: 2px solid #3b82f6; }
@@ -38,23 +29,36 @@
                 <p class="text-[8px] text-gray-500 uppercase font-black mb-1">Total</p>
                 <h2 id="totalCount" class="text-xl font-bold text-white">0</h2>
             </div>
-            <div class="bg-[#0a0a0a] p-4 rounded-3xl text-center border border-gray-900 shadow-lg shadow-emerald-900/5">
+            <div class="bg-[#0a0a0a] p-4 rounded-3xl text-center border border-gray-900">
                 <p class="text-[8px] text-emerald-500 uppercase font-black mb-1">Paid</p>
                 <h2 id="paidCount" class="text-xl font-bold text-emerald-500">0</h2>
             </div>
-            <div class="bg-[#0a0a0a] p-4 rounded-3xl text-center border border-gray-900 shadow-lg shadow-rose-900/5">
+            <div class="bg-[#0a0a0a] p-4 rounded-3xl text-center border border-gray-900">
                 <p class="text-[8px] text-rose-500 uppercase font-black mb-1">Due</p>
                 <h2 id="dueCount" class="text-xl font-bold text-rose-500">0</h2>
             </div>
         </div>
 
-        <div class="flex gap-8 mb-8 px-2 border-b border-gray-900">
+        <div class="flex gap-6 mb-8 px-2 border-b border-gray-900 overflow-x-auto whitespace-nowrap">
             <button onclick="switchTab('all')" id="tab-all" class="tab-btn active pb-4">সবাই</button>
             <button onclick="switchTab('due')" id="tab-due" class="tab-btn pb-4">বাকি</button>
             <button onclick="switchTab('paid')" id="tab-paid" class="tab-btn pb-4">পেইড</button>
+            <button onclick="openReportModal()" class="tab-btn pb-4 text-orange-500">REPORT 📢</button>
         </div>
 
         <div id="userList" class="space-y-4 pb-24"></div>
+    </div>
+
+    <div id="reportModal" class="modal">
+        <div class="bg-[#0a0a0a] w-[85%] max-w-xs p-6 rounded-[2.5rem] border border-gray-800 shadow-2xl">
+            <h3 class="text-center font-bold text-orange-500 mb-6 tracking-widest uppercase">Send Report</h3>
+            <div class="space-y-3">
+                <button onclick="sendBulkReport('all')" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold text-sm">সবাইকে পাঠান</button>
+                <button onclick="sendBulkReport('due')" class="w-full bg-rose-600 text-white p-4 rounded-2xl font-bold text-sm">বাকীদের তালিকা পাঠান</button>
+                <button onclick="sendBulkReport('paid')" class="w-full bg-emerald-600 text-white p-4 rounded-2xl font-bold text-sm">সাকসেস তালিকা পাঠান</button>
+                <button onclick="closeReportModal()" class="w-full p-2 text-gray-600 text-[10px] font-bold uppercase mt-2">ফিরে যান</button>
+            </div>
+        </div>
     </div>
 
     <div id="actionModal" class="modal">
@@ -63,68 +67,69 @@
                 <h3 id="targetName" class="text-lg font-bold text-white tracking-tight italic">নাম</h3>
                 <div class="w-12 h-1 bg-blue-600 mx-auto mt-2 rounded-full"></div>
             </div>
-
-            <button onclick="confirmDeleteUser()" class="w-full bg-rose-950/20 text-rose-500 p-4 rounded-2xl font-bold text-[10px] uppercase mb-6 border border-rose-900/30">
-                🗑 ইউজার ডিলিট
-            </button>
-            
+            <button onclick="confirmDeleteUser()" class="w-full bg-rose-950/20 text-rose-500 p-4 rounded-2xl font-bold text-[10px] uppercase mb-6 border border-rose-900/30">🗑 ডিলিট</button>
             <div class="space-y-3">
-                <button id="statusActionBtn" onclick="handleStatusToggle()" class="w-full bg-emerald-600 text-white p-4 rounded-2xl font-bold text-sm shadow-lg shadow-emerald-900/20">
-                    বিল সাকসেস (Success)
-                </button>
-                <button onclick="handleEditClick()" class="w-full bg-gray-900 text-white p-4 rounded-2xl font-bold text-sm border border-gray-800">
-                    নাম পরিবর্তন (Edit)
-                </button>
-                <button onclick="closeActionModal()" class="w-full p-2 text-gray-600 text-[10px] font-bold uppercase mt-2 tracking-widest">ফিরে যান</button>
+                <button id="statusActionBtn" onclick="handleStatusToggle()" class="w-full bg-emerald-600 text-white p-4 rounded-2xl font-bold text-sm">বিল সাকসেস</button>
+                <button onclick="handleEditClick()" class="w-full bg-gray-900 text-white p-4 rounded-2xl font-bold text-sm border border-gray-800">নাম পরিবর্তন</button>
+                <button onclick="closeActionModal()" class="w-full p-2 text-gray-600 text-[10px] font-bold uppercase mt-2">ফিরে যান</button>
             </div>
         </div>
     </div>
 
     <div id="dataModal" class="modal">
         <div class="bg-[#0a0a0a] w-[90%] max-w-sm p-8 rounded-[3rem] border border-gray-800">
-            <h3 id="modalTitle" class="text-lg font-bold mb-8 text-center text-blue-500 tracking-widest uppercase">Add User</h3>
+            <h3 id="modalTitle" class="text-lg font-bold mb-8 text-center text-blue-500 uppercase">Add User</h3>
             <input type="hidden" id="editId">
             <div class="space-y-6">
-                <input type="text" id="userName" placeholder="নাম লিখুন..." class="w-full p-5 bg-black border border-gray-800 rounded-2xl outline-none focus:border-blue-600 text-center text-lg text-white">
-                <button onclick="saveUser()" class="w-full bg-white text-black p-5 rounded-2xl font-black text-sm uppercase tracking-widest active:scale-95 transition-all">সেভ করুন</button>
+                <input type="text" id="userName" placeholder="নাম লিখুন..." class="w-full p-5 bg-black border border-gray-800 rounded-2xl outline-none text-center text-white">
+                <button onclick="saveUser()" class="w-full bg-white text-black p-5 rounded-2xl font-black text-sm uppercase">সেভ করুন</button>
                 <button onclick="closeDataModal()" class="w-full text-gray-600 font-bold text-[10px] uppercase">বাতিল</button>
             </div>
         </div>
     </div>
 
     <script>
-        // আপনার দেওয়া টেলিগ্রাম তথ্য এখানে সেট করা হয়েছে
         const BOT_TOKEN = "7885791804:AAHQjsAsMuBfvVqWga0hub2m0QZ7BrgsAsc"; 
         const CHAT_ID = "5923885908";     
 
-        let users = JSON.parse(localStorage.getItem('billingFinalV10')) || [];
+        let users = JSON.parse(localStorage.getItem('billingFinalV11')) || [];
         let currentTab = 'all';
         let activeUserId = null;
         let holdTimer;
 
-        async function sendTelegramReport(userName, status) {
+        // বাল্ক রিপোর্ট পাঠানোর ফাংশন
+        async function sendBulkReport(type) {
             const date = new Date().toLocaleDateString('bn-BD');
-            const total = users.length;
-            const paid = users.filter(u => u.isPaid).length;
-            const due = total - paid;
+            let list = [];
+            let title = "";
 
-            const text = `📢 *বিল রিপোর্ট (${date})*\n\n` +
-                         `👤 ইউজার: *${userName}*\n` +
-                         `💰 স্ট্যাটাস: *${status}*\n\n` +
-                         `📊 *সামারি:*\n` +
-                         `🟢 পেইড: ${paid} জন\n` +
-                         `🔴 বাকি: ${due} জন\n` +
-                         `⚪ মোট: ${total} জন`;
+            if(type === 'all') {
+                list = users;
+                title = "📋 সকল ইউজারের তালিকা";
+            } else if(type === 'due') {
+                list = users.filter(u => !u.isPaid);
+                title = "🔴 বাকি তালিকা";
+            } else if(type === 'paid') {
+                list = users.filter(u => u.isPaid);
+                title = "🟢 বিল সাকসেস তালিকা";
+            }
+
+            if(list.length === 0) { alert("তালিকায় কেউ নেই!"); return; }
+
+            let nameList = list.map((u, i) => `${i+1}. ${u.name}`).join('\n');
+            const text = `📢 *${title}*\n📅 তারিখ: ${date}\n\n${nameList}\n\n📊 মোট: ${list.length} জন`;
 
             const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
             
             try { 
                 await fetch(url); 
-                console.log("টেলিগ্রাম রিপোর্ট সফলভাবে পাঠানো হয়েছে।");
-            } catch (e) { 
-                console.error("টেলিগ্রামে রিপোর্ট পাঠানো যায়নি।"); 
-            }
+                alert("টেলিগ্রামে রিপোর্ট পাঠানো হয়েছে!");
+                closeReportModal();
+            } catch (e) { alert("ত্রুটি হয়েছে!"); }
         }
+
+        function openReportModal() { document.getElementById('reportModal').classList.add('active-modal'); }
+        function closeReportModal() { document.getElementById('reportModal').classList.remove('active-modal'); }
 
         function switchTab(tab) {
             currentTab = tab;
@@ -149,14 +154,19 @@
         function onTouchEnd() { clearTimeout(holdTimer); }
         function closeActionModal() { document.getElementById('actionModal').classList.remove('active-modal'); }
 
+        async function sendSingleReport(userName, status) {
+            const date = new Date().toLocaleDateString('bn-BD');
+            const text = `📢 *বিল রিপোর্ট*\n👤 ইউজার: *${userName}*\n💰 স্ট্যাটাস: *${status}*\n📅 তারিখ: ${date}`;
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
+            try { await fetch(url); } catch (e) {}
+        }
+
         function handleStatusToggle() {
             const user = users.find(u => u.id === activeUserId);
             const newStatus = !user.isPaid;
             users = users.map(u => u.id === activeUserId ? {...u, isPaid: newStatus} : u);
             saveAndRender();
-            if (newStatus) { 
-                sendTelegramReport(user.name, "সাকসেস ✅"); 
-            }
+            if (newStatus) { sendSingleReport(user.name, "সাকসেস ✅"); }
             closeActionModal();
         }
 
@@ -195,7 +205,7 @@
         }
 
         function saveAndRender() {
-            localStorage.setItem('billingFinalV10', JSON.stringify(users));
+            localStorage.setItem('billingFinalV11', JSON.stringify(users));
             renderData();
         }
 
@@ -213,13 +223,10 @@
                          ontouchstart="onTouchStart(${u.id}, ${u.isPaid})" ontouchend="onTouchEnd()">
                         ${u.isPaid ? '<div class="success-tag">Success Bill</div>' : ''}
                         <h4 class="user-name-text ${u.isPaid ? 'opacity-30 line-through' : ''}">${u.name}</h4>
-                        <div class="flex items-center gap-2">
-                             <div class="w-2.5 h-2.5 rounded-full ${u.isPaid ? 'bg-emerald-500 shadow-[0_0_12px_#10b981]' : 'bg-rose-600'}"></div>
-                        </div>
+                        <div class="w-2.5 h-2.5 rounded-full ${u.isPaid ? 'bg-emerald-500 shadow-[0_0_12px_#10b981]' : 'bg-rose-600'}"></div>
                     </div>
                 `;
             });
-
             document.getElementById('totalCount').innerText = users.length;
             document.getElementById('paidCount').innerText = users.filter(u => u.isPaid).length;
             document.getElementById('dueCount').innerText = users.filter(u => !u.isPaid).length;
