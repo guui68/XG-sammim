@@ -3,104 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>স্মার্ট বিলিং ম্যানেজার</title>
+    <title>বিলিং আইডি ট্র্যাকার</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .modal { display: none; background: rgba(0,0,0,0.9); }
         .active-modal { display: flex; }
-        /* বড় টিকমার্ক ডিজাইন */
-        .check-box {
-            width: 32px; height: 32px;
-            border: 2px solid #3b82f6;
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.3s;
-        }
-        .check-box.active { background: #10b981; border-color: #10b981; color: white; }
-        /* ট্যাব বাটন স্টাইল */
-        .tab-btn { border-radius: 12px; transition: 0.3s; }
-        .tab-btn.active { background: #3b82f6; color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        .user-card { transition: all 0.3s; user-select: none; -webkit-touch-callout: none; }
+        .tab-btn.active { background: #3b82f6; color: white; border-radius: 12px; }
+        .status-badge { font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 6px; }
     </style>
 </head>
 <body class="bg-black text-slate-100 font-sans min-h-screen">
 
     <div class="max-w-xl mx-auto p-4">
-        <div class="grid grid-cols-3 gap-2 py-6 mb-4 border-b border-gray-900">
-            <div class="text-center">
-                <p class="text-[10px] text-gray-500 font-bold uppercase">মোট ইউজার</p>
-                <h2 id="totalCount" class="text-2xl font-black">0</h2>
-            </div>
-            <div class="text-center">
-                <p class="text-[10px] text-emerald-500 font-bold uppercase">পেইড</p>
-                <h2 id="paidCount" class="text-2xl font-black text-emerald-500">0</h2>
-            </div>
-            <div class="text-center">
-                <p class="text-[10px] text-rose-500 font-bold uppercase">বাকি</p>
-                <h2 id="dueCount" class="text-2xl font-black text-rose-500">0</h2>
-            </div>
+        <div class="grid grid-cols-3 gap-2 py-6 mb-4 border-b border-gray-800 text-center">
+            <div><p class="text-[10px] text-gray-500 uppercase">মোট</p><h2 id="totalCount" class="text-2xl font-black">0</h2></div>
+            <div><p class="text-[10px] text-emerald-500 uppercase">পেইড</p><h2 id="paidCount" class="text-2xl font-black text-emerald-500">0</h2></div>
+            <div><p class="text-[10px] text-rose-500 uppercase">বাকি</p><h2 id="dueCount" class="text-2xl font-black text-rose-500">0</h2></div>
         </div>
 
-        <div class="flex bg-gray-900 p-1 rounded-2xl mb-6">
-            <button onclick="switchTab('all')" id="tab-all" class="tab-btn active flex-1 py-3 font-bold text-xs">সব ইউজার (All)</button>
-            <button onclick="switchTab('due')" id="tab-due" class="tab-btn flex-1 py-3 font-bold text-xs">বাকি (Due)</button>
-            <button onclick="switchTab('paid')" id="tab-paid" class="tab-btn flex-1 py-3 font-bold text-xs">পেইড (Paid)</button>
+        <div class="relative mb-6">
+            <input type="text" id="search" onkeyup="renderData()" placeholder="নাম বা আইডি দিয়ে খুঁজুন..." 
+                   class="w-full bg-gray-900 border border-gray-800 p-5 rounded-2xl outline-none focus:border-blue-500 text-lg shadow-2xl">
+            <div class="absolute right-4 top-5 text-gray-600">🔍</div>
         </div>
 
-        <div class="flex gap-2 mb-8">
-            <input type="text" id="search" onkeyup="renderData()" placeholder="নাম দিয়ে খুঁজুন..." class="flex-1 bg-gray-900 border border-gray-800 p-4 rounded-2xl outline-none focus:border-blue-500">
-            <button onclick="toggleModal(true)" class="bg-blue-600 px-6 rounded-2xl font-bold text-xl">+</button>
+        <div class="flex bg-gray-900 p-1 rounded-2xl mb-6 shadow-inner">
+            <button onclick="switchTab('all')" id="tab-all" class="tab-btn active flex-1 py-3 font-bold text-xs uppercase">সব ইউজার</button>
+            <button onclick="switchTab('due')" id="tab-due" class="tab-btn flex-1 py-3 font-bold text-xs uppercase text-rose-400">বাকি</button>
+            <button onclick="switchTab('paid')" id="tab-paid" class="tab-btn flex-1 py-3 font-bold text-xs uppercase text-emerald-400">পেইড</button>
         </div>
 
-        <div id="userList" class="space-y-3 pb-24">
-            </div>
+        <div class="flex justify-between items-center mb-4 px-2">
+            <p class="text-[10px] text-gray-500 italic">লং প্রেস = সাকসেস</p>
+            <button onclick="openModal()" class="bg-blue-600 px-4 py-2 rounded-xl font-bold text-sm">+ নতুন অ্যাড</button>
+        </div>
+
+        <div id="userList" class="space-y-4 pb-24"></div>
     </div>
 
     <div id="userModal" class="modal fixed inset-0 z-50 items-center justify-center p-6">
         <div class="bg-gray-900 w-full max-w-sm p-6 rounded-3xl border border-gray-800 shadow-2xl">
-            <h3 class="text-xl font-bold mb-6 text-blue-500">নতুন ইউজার অ্যাড</h3>
+            <h3 id="modalTitle" class="text-xl font-bold mb-6 text-blue-400">ইউজার তথ্য</h3>
+            <input type="hidden" id="editId">
             <div class="space-y-4">
-                <input type="text" id="userName" placeholder="নাম লিখুন" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl outline-none">
+                <input type="text" id="userName" placeholder="নাম" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl outline-none">
                 <input type="number" id="userAmount" placeholder="টাকা" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl outline-none">
-                <select id="userMonth" class="w-full p-4 bg-gray-800 border border-gray-700 rounded-xl outline-none">
-                    <option>ফেব্রুয়ারি ২০২৬</option>
-                    <option>মার্চ ২০২৬</option>
-                </select>
                 <div class="flex gap-2 pt-4">
-                    <button onclick="addUser()" class="flex-1 bg-blue-600 p-4 rounded-xl font-bold active:scale-95 transition">সেভ করুন</button>
-                    <button onclick="toggleModal(false)" class="bg-gray-800 px-6 rounded-xl font-bold">বাতিল</button>
+                    <button onclick="handleFormSubmit()" class="flex-1 bg-blue-600 p-4 rounded-xl font-bold">সেভ করুন</button>
+                    <button onclick="closeModal()" class="bg-gray-800 px-6 rounded-xl font-bold">বাতিল</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let users = JSON.parse(localStorage.getItem('myAdvancedBilling')) || [];
+        // ডাটাবেস
+        let users = JSON.parse(localStorage.getItem('idBillingDB')) || [];
         let currentTab = 'all';
+        let holdTimer;
 
-        function toggleModal(show) {
-            document.getElementById('userModal').classList.toggle('active-modal', show);
+        // ইউনিক আইডি তৈরি (যেমন: ID-170756...)
+        function generateId() { return 'ID-' + Math.floor(Math.random() * 9000 + 1000); }
+
+        function openModal(id = null) {
+            const modal = document.getElementById('userModal');
+            if (id) {
+                const user = users.find(u => u.id === id);
+                document.getElementById('editId').value = user.id;
+                document.getElementById('userName').value = user.name;
+                document.getElementById('userAmount').value = user.amount;
+                document.getElementById('modalTitle').innerText = "তথ্য এডিট করুন";
+            } else {
+                document.getElementById('editId').value = "";
+                document.getElementById('userName').value = "";
+                document.getElementById('userAmount').value = "";
+                document.getElementById('modalTitle').innerText = "নতুন ইউজার অ্যাড";
+            }
+            modal.classList.add('active-modal');
         }
 
-        function switchTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-' + tab).classList.add('active');
-            renderData();
-        }
+        function closeModal() { document.getElementById('userModal').classList.remove('active-modal'); }
 
-        function addUser() {
+        function handleFormSubmit() {
+            const editId = document.getElementById('editId').value;
             const name = document.getElementById('userName').value.trim();
             const amount = document.getElementById('userAmount').value.trim();
-            const month = document.getElementById('userMonth').value;
+            if (!name || !amount) return;
 
-            if (!name || !amount) return alert("দয়া করে নাম ও টাকা লিখুন!");
-
-            users.unshift({ id: Date.now(), name, amount, month, isPaid: false });
+            if (editId) {
+                users = users.map(u => u.id == editId ? { ...u, name, amount } : u);
+            } else {
+                users.unshift({ 
+                    id: Date.now(), 
+                    displayId: generateId(), 
+                    name, 
+                    amount, 
+                    isPaid: false 
+                });
+            }
             saveAndRender();
-            toggleModal(false);
-            document.getElementById('userName').value = '';
-            document.getElementById('userAmount').value = '';
+            closeModal();
         }
+
+        // লং প্রেস লজিক
+        function onTouchStart(id) {
+            const user = users.find(u => u.id === id);
+            if (user.isPaid) return; 
+            holdTimer = setTimeout(() => {
+                toggleStatus(id);
+                alert("সাকসেসফুলি পেইড লিস্টে অ্যাড হয়েছে! ✅");
+            }, 1000);
+        }
+        function onTouchEnd() { clearTimeout(holdTimer); }
 
         function toggleStatus(id) {
             users = users.map(u => u.id === id ? { ...u, isPaid: !u.isPaid } : u);
@@ -114,8 +129,15 @@
             }
         }
 
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            renderData();
+        }
+
         function saveAndRender() {
-            localStorage.setItem('myAdvancedBilling', JSON.stringify(users));
+            localStorage.setItem('idBillingDB', JSON.stringify(users));
             renderData();
         }
 
@@ -124,38 +146,44 @@
             const searchVal = document.getElementById('search').value.toLowerCase();
             listArea.innerHTML = '';
 
-            // ফিল্টারিং লজিক
-            let filtered = users.filter(u => u.name.toLowerCase().includes(searchVal));
+            // সার্চ লজিক (নাম অথবা আইডি দিয়ে)
+            let filtered = users.filter(u => 
+                u.name.toLowerCase().includes(searchVal) || 
+                u.displayId.toLowerCase().includes(searchVal)
+            );
+
             if (currentTab === 'due') filtered = filtered.filter(u => !u.isPaid);
             if (currentTab === 'paid') filtered = filtered.filter(u => u.isPaid);
 
-            if(filtered.length === 0) {
-                listArea.innerHTML = `<p class="text-center text-gray-700 py-10">কোন ডাটা পাওয়া যায়নি</p>`;
-            }
-
             filtered.forEach(u => {
+                const statusColor = u.isPaid ? 'text-emerald-500 bg-emerald-500/10' : 'text-rose-500 bg-rose-500/10';
+                const statusText = u.isPaid ? 'টাকা দিছে (PAID)' : 'দিছে না (UNPAID)';
+                
                 listArea.innerHTML += `
-                    <div class="bg-gray-900 border border-gray-800 p-5 rounded-3xl flex justify-between items-center transition-all ${u.isPaid ? 'border-emerald-500/30' : ''}">
-                        <div class="flex items-center gap-4">
-                            <div onclick="toggleStatus(${u.id})" class="check-box ${u.isPaid ? 'active' : ''}">
-                                ${u.isPaid ? '✔' : ''}
-                            </div>
-                            <div>
-                                <h4 class="font-bold ${u.isPaid ? 'text-gray-500 line-through' : 'text-white'}">${u.name}</h4>
-                                <p class="text-[10px] text-gray-500">${u.amount} TK | ${u.month}</p>
+                    <div class="user-card bg-gray-900 border border-gray-800 p-5 rounded-[2rem] flex justify-between items-center shadow-lg"
+                         onmousedown="onTouchStart(${u.id})" onmouseup="onTouchEnd()" 
+                         ontouchstart="onTouchStart(${u.id})" ontouchend="onTouchEnd()">
+                        
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[10px] text-blue-500 font-mono font-bold">${u.displayId}</span>
+                            <h4 class="font-bold text-lg ${u.isPaid ? 'text-gray-500 line-through' : 'text-white'}">${u.name}</h4>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-400 font-bold">${u.amount} TK</span>
+                                <span class="status-badge ${statusColor}">${statusText}</span>
                             </div>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <span class="text-[8px] font-bold px-2 py-1 rounded-lg bg-black ${u.isPaid ? 'text-emerald-400' : 'text-rose-500'}">
-                                ${u.isPaid ? 'পেইড' : 'বাকি'}
-                            </span>
-                            <button onclick="deleteUser(${u.id})" class="text-gray-700 hover:text-rose-600">✕</button>
+
+                        <div class="flex items-center gap-2">
+                            ${u.isPaid ? `
+                                <button onclick="openModal(${u.id})" class="p-2 bg-blue-900/20 text-blue-400 rounded-full">✎</button>
+                                <button onclick="toggleStatus(${u.id})" class="p-2 bg-rose-900/20 text-rose-500 rounded-full">↺</button>
+                            ` : ''}
+                            <button onclick="deleteUser(${u.id})" class="p-2 text-gray-700 text-xl">✕</button>
                         </div>
                     </div>
                 `;
             });
 
-            // ড্যাশবোর্ড আপডেট
             const paidNum = users.filter(u => u.isPaid).length;
             document.getElementById('totalCount').innerText = users.length;
             document.getElementById('paidCount').innerText = paidNum;
