@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বিলিং প্রো - ক্লিন লিস্ট</title>
+    <title>বিলিং প্রো - কানি ডিজাইন</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
-        .modal { display: none; position: fixed; inset: 0; z-index: 50; align-items: center; justify-content: center; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); }
+        .modal { display: none; position: fixed; inset: 0; z-index: 50; align-items: center; justify-content: center; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); }
         .active-modal { display: flex; }
-        .user-card { transition: 0.3s; border-bottom: 1px solid #0f0f0f; cursor: pointer; }
-        .user-card:active { background: #0a0a0a; transform: scale(0.98); }
+        .user-card { transition: 0.3s; border: 1px solid #111; position: relative; overflow: hidden; background: #050505; }
+        .user-card:active { transform: scale(0.98); background: #0a0a0a; }
+        .success-tag { position: absolute; top: 0; right: 0; background: #10b981; color: #000; font-size: 8px; font-weight: 900; padding: 2px 8px; border-bottom-left-radius: 10px; text-transform: uppercase; }
         .tab-btn { transition: 0.3s; color: #444; font-size: 13px; font-weight: 700; border-bottom: 2px solid transparent; }
         .tab-btn.active { color: #fff; border-bottom: 2px solid #3b82f6; }
     </style>
@@ -19,20 +20,20 @@
 
     <div class="max-w-md mx-auto">
         <div class="flex justify-between items-center mb-10 pt-4 px-2">
-            <h1 class="text-xl font-black italic tracking-tighter uppercase">Lister</h1>
-            <button onclick="openAddModal()" class="w-12 h-12 bg-white text-black rounded-full font-bold text-3xl shadow-xl shadow-white/5">+</button>
+            <h1 class="text-xl font-black italic tracking-tighter uppercase">Lister<span class="text-blue-600">Pro</span></h1>
+            <button onclick="openAddModal()" class="w-12 h-12 bg-white text-black rounded-full font-bold text-3xl shadow-xl shadow-white/10">+</button>
         </div>
 
         <div class="grid grid-cols-3 gap-3 mb-10">
-            <div class="bg-[#0a0a0a] p-4 rounded-[2rem] text-center border border-gray-900">
+            <div class="bg-[#0a0a0a] p-4 rounded-3xl text-center border border-gray-900">
                 <p class="text-[8px] text-gray-500 uppercase font-black mb-1">Total</p>
                 <h2 id="totalCount" class="text-xl font-bold">0</h2>
             </div>
-            <div class="bg-[#0a0a0a] p-4 rounded-[2rem] text-center border border-gray-900">
+            <div class="bg-[#0a0a0a] p-4 rounded-3xl text-center border border-gray-900">
                 <p class="text-[8px] text-emerald-500 uppercase font-black mb-1">Paid</p>
                 <h2 id="paidCount" class="text-xl font-bold text-emerald-500">0</h2>
             </div>
-            <div class="bg-[#0a0a0a] p-4 rounded-[2rem] text-center border border-gray-900">
+            <div class="bg-[#0a0a0a] p-4 rounded-3xl text-center border border-gray-900">
                 <p class="text-[8px] text-rose-500 uppercase font-black mb-1">Due</p>
                 <h2 id="dueCount" class="text-xl font-bold text-rose-500">0</h2>
             </div>
@@ -44,14 +45,14 @@
             <button onclick="switchTab('paid')" id="tab-paid" class="tab-btn pb-4">পেইড</button>
         </div>
 
-        <div id="userList" class="space-y-0.5 pb-24"></div>
+        <div id="userList" class="space-y-3 pb-24"></div>
     </div>
 
     <div id="actionModal" class="modal">
-        <div class="bg-[#0a0a0a] w-[85%] max-w-xs p-6 rounded-[3rem] border border-gray-800 shadow-2xl">
-            <div class="text-center mb-6">
-                <h3 id="targetName" class="text-lg font-bold text-white">নাম</h3>
-                <p id="targetAmount" class="text-xs text-gray-500 font-bold">0 TK</p>
+        <div class="bg-[#0a0a0a] w-[85%] max-w-xs p-6 rounded-[2.5rem] border border-gray-800 shadow-2xl">
+            <div class="text-center mb-8">
+                <h3 id="targetName" class="text-lg font-bold text-white tracking-tight">নাম</h3>
+                <div class="w-10 h-1 bg-blue-600 mx-auto mt-2 rounded-full"></div>
             </div>
 
             <button onclick="confirmDeleteUser()" class="w-full bg-rose-950/20 text-rose-500 p-4 rounded-2xl font-bold text-[10px] uppercase mb-6 border border-rose-900/30">
@@ -63,7 +64,7 @@
                     বিল সাকসেস
                 </button>
                 <button onclick="handleEditClick()" class="w-full bg-gray-900 text-white p-4 rounded-2xl font-bold text-sm border border-gray-800">
-                    এডিট ইউজার
+                    নাম পরিবর্তন
                 </button>
                 <button onclick="closeActionModal()" class="w-full p-2 text-gray-600 text-[10px] font-bold uppercase mt-2 tracking-widest">ফিরে যান</button>
             </div>
@@ -71,20 +72,19 @@
     </div>
 
     <div id="dataModal" class="modal">
-        <div class="bg-[#0a0a0a] w-[90%] max-w-sm p-8 rounded-[3.5rem] border border-gray-800">
-            <h3 id="modalTitle" class="text-lg font-bold mb-8 text-center text-blue-500">USER ENTRY</h3>
+        <div class="bg-[#0a0a0a] w-[90%] max-w-sm p-8 rounded-[3rem] border border-gray-800">
+            <h3 id="modalTitle" class="text-lg font-bold mb-8 text-center text-blue-500 tracking-widest">ADD NAME</h3>
             <input type="hidden" id="editId">
-            <div class="space-y-4">
-                <input type="text" id="userName" placeholder="নাম লিখুন" class="w-full p-4 bg-black border border-gray-800 rounded-2xl outline-none focus:border-blue-500">
-                <input type="number" id="userAmount" placeholder="টাকার পরিমাণ" class="w-full p-4 bg-black border border-gray-800 rounded-2xl outline-none focus:border-blue-500">
-                <button onclick="saveUser()" class="w-full bg-white text-black p-4 rounded-2xl font-bold mt-4">সেভ করুন</button>
-                <button onclick="closeDataModal()" class="w-full text-gray-600 font-bold text-[10px] mt-2 uppercase">বন্ধ করুন</button>
+            <div class="space-y-6">
+                <input type="text" id="userName" placeholder="ইউজারের নাম লিখুন" class="w-full p-5 bg-black border border-gray-800 rounded-2xl outline-none focus:border-blue-600 text-center text-lg transition-all">
+                <button onclick="saveUser()" class="w-full bg-white text-black p-5 rounded-2xl font-black text-sm uppercase tracking-widest">সেভ করুন</button>
+                <button onclick="closeDataModal()" class="w-full text-gray-600 font-bold text-[10px] uppercase tracking-tighter">বাতিল</button>
             </div>
         </div>
     </div>
 
     <script>
-        let users = JSON.parse(localStorage.getItem('billingCleanV7')) || [];
+        let users = JSON.parse(localStorage.getItem('billingFinalV8')) || [];
         let currentTab = 'all';
         let activeUserId = null;
         let holdTimer;
@@ -102,7 +102,6 @@
             holdTimer = setTimeout(() => {
                 const user = users.find(u => u.id === id);
                 document.getElementById('targetName').innerText = user.name;
-                document.getElementById('targetAmount').innerText = user.amount + " TK";
                 
                 const statusBtn = document.getElementById('statusActionBtn');
                 statusBtn.innerText = user.isPaid ? "আবার বাকি করুন" : "বিল সাকসেস";
@@ -127,14 +126,13 @@
             const user = users.find(u => u.id === activeUserId);
             document.getElementById('editId').value = user.id;
             document.getElementById('userName').value = user.name;
-            document.getElementById('userAmount').value = user.amount;
-            document.getElementById('modalTitle').innerText = "EDIT INFO";
+            document.getElementById('modalTitle').innerText = "EDIT NAME";
             closeActionModal();
             document.getElementById('dataModal').classList.add('active-modal');
         }
 
         function confirmDeleteUser() {
-            if(confirm("ডিলিট করতে চান?")) {
+            if(confirm("মুছে ফেলতে চান?")) {
                 users = users.filter(u => u.id !== activeUserId);
                 saveAndRender();
                 closeActionModal();
@@ -144,7 +142,6 @@
         function openAddModal() {
             document.getElementById('editId').value = "";
             document.getElementById('userName').value = "";
-            document.getElementById('userAmount').value = "";
             document.getElementById('modalTitle').innerText = "NEW ENTRY";
             document.getElementById('dataModal').classList.add('active-modal');
         }
@@ -154,20 +151,19 @@
         function saveUser() {
             const id = document.getElementById('editId').value;
             const name = document.getElementById('userName').value.trim();
-            const amount = document.getElementById('userAmount').value.trim();
-            if(!name || !amount) return;
+            if(!name) return;
 
             if(id) {
-                users = users.map(u => u.id == id ? {...u, name, amount} : u);
+                users = users.map(u => u.id == id ? {...u, name} : u);
             } else {
-                users.unshift({ id: Date.now(), name, amount, isPaid: false });
+                users.unshift({ id: Date.now(), name, isPaid: false });
             }
             saveAndRender();
             closeDataModal();
         }
 
         function saveAndRender() {
-            localStorage.setItem('billingCleanV7', JSON.stringify(users));
+            localStorage.setItem('billingFinalV8', JSON.stringify(users));
             renderData();
         }
 
@@ -180,11 +176,17 @@
 
             filtered.forEach(u => {
                 list.innerHTML += `
-                    <div class="user-card py-6 px-4 flex justify-between items-center" 
+                    <div class="user-card p-6 rounded-2xl flex justify-between items-center" 
                          onmousedown="onTouchStart(${u.id}, ${u.isPaid})" onmouseup="onTouchEnd()" 
                          ontouchstart="onTouchStart(${u.id}, ${u.isPaid})" ontouchend="onTouchEnd()">
-                        <h4 class="font-bold text-[16px] tracking-tight ${u.isPaid ? 'text-gray-700' : 'text-gray-100'}">${u.name}</h4>
-                        <div class="w-1.5 h-1.5 rounded-full ${u.isPaid ? 'bg-emerald-500' : 'bg-rose-600'}"></div>
+                        
+                        ${u.isPaid ? '<div class="success-tag">Success Bill</div>' : ''}
+                        
+                        <h4 class="font-bold text-[17px] ${u.isPaid ? 'text-gray-600' : 'text-gray-100'}">${u.name}</h4>
+                        
+                        <div class="flex items-center gap-2">
+                             <div class="w-1.5 h-1.5 rounded-full ${u.isPaid ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-rose-600'}"></div>
+                        </div>
                     </div>
                 `;
             });
