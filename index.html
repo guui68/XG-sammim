@@ -3,174 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>হিসাব খাতা প্রো - বিলিং সিস্টেম</title>
+    <title>বিলিং ম্যানেজার প্রো</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* কাস্টম ডিজাইন */
-        input[type="checkbox"] { transform: scale(1.4); cursor: pointer; }
-        .paid-bg { background-color: #064e3b !important; border-color: #059669 !important; }
-        .paid-text { color: #9ca3af; text-decoration: line-through; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .modal { display: none; background: rgba(0,0,0,0.85); }
+        .active-modal { display: flex; }
+        input[type="checkbox"] { width: 22px; height: 22px; accent-color: #10b981; cursor: pointer; }
+        .paid-card { border-left: 5px solid #10b981; background: #064e3b20; }
+        .due-card { border-left: 5px solid #f43f5e; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 p-4 min-h-screen">
+<body class="bg-slate-950 text-slate-100 p-4 font-sans min-h-screen">
 
     <div class="max-w-xl mx-auto">
-        <div class="grid grid-cols-3 gap-3 mb-6">
-            <div class="bg-blue-900/50 border border-blue-700 p-4 rounded-3xl text-center shadow-xl">
-                <p class="text-[10px] text-blue-300 uppercase tracking-widest font-bold">মোট ইউজার</p>
-                <h2 id="totalUsers" class="text-2xl font-black">0</h2>
+        <div class="grid grid-cols-3 gap-2 mb-6">
+            <div class="bg-blue-600/20 border border-blue-600 p-3 rounded-2xl text-center">
+                <p class="text-[10px] uppercase font-bold text-blue-400">মোট</p>
+                <h2 id="totalCount" class="text-xl font-bold">0</h2>
             </div>
-            <div class="bg-emerald-900/50 border border-emerald-700 p-4 rounded-3xl text-center shadow-xl">
-                <p class="text-[10px] text-emerald-300 uppercase tracking-widest font-bold">বেতন দিছে</p>
-                <h2 id="paidCount" class="text-2xl font-black text-emerald-400">0</h2>
+            <div class="bg-emerald-600/20 border border-emerald-600 p-3 rounded-2xl text-center">
+                <p class="text-[10px] uppercase font-bold text-emerald-400">পেইড</p>
+                <h2 id="paidCount" class="text-xl font-bold">0</h2>
             </div>
-            <div class="bg-rose-900/50 border border-rose-700 p-4 rounded-3xl text-center shadow-xl">
-                <p class="text-[10px] text-rose-300 uppercase tracking-widest font-bold">বাকি আছে</p>
-                <h2 id="dueCount" class="text-2xl font-black text-rose-400">0</h2>
+            <div class="bg-rose-600/20 border border-rose-600 p-3 rounded-2xl text-center">
+                <p class="text-[10px] uppercase font-bold text-rose-400">বাকি</p>
+                <h2 id="dueCount" class="text-xl font-bold">0</h2>
             </div>
         </div>
 
-        <div class="bg-slate-900 p-6 rounded-[2.5rem] border border-slate-800 shadow-2xl mb-8">
-            <h3 class="text-blue-400 font-bold mb-4 flex items-center gap-2">
-                <span class="w-2 h-2 bg-blue-500 rounded-full"></span> নতুন ইউজার যোগ করুন
-            </h3>
+        <div class="flex gap-2 mb-6">
+            <button onclick="openAddModal()" class="bg-blue-600 hover:bg-blue-500 px-4 py-3 rounded-xl font-bold text-sm flex-1 shadow-lg shadow-blue-900/20 transition-all">+ নতুন ইউজার</button>
+            <div class="relative w-2/3">
+                <input type="text" id="search" onkeyup="renderData()" placeholder="নাম দিয়ে খুঁজুন..." class="w-full bg-slate-900 border border-slate-700 px-4 py-3 rounded-xl outline-none focus:border-emerald-500 transition-all">
+            </div>
+        </div>
+
+        <h3 class="text-rose-400 font-bold mb-3 text-sm flex items-center gap-2">
+            <span class="w-2 h-2 bg-rose-500 rounded-full animate-pulse"></span> পেমেন্ট বাকি
+        </h3>
+        <div id="dueList" class="space-y-3 mb-8"></div>
+
+        <hr class="border-slate-800 mb-8">
+
+        <h3 class="text-emerald-400 font-bold mb-3 text-sm flex items-center gap-2">
+            <span class="w-2 h-2 bg-emerald-500 rounded-full"></span> পেমেন্ট সাকসেস (পেইড)
+        </h3>
+        <div id="paidList" class="space-y-3 pb-10"></div>
+    </div>
+
+    <div id="userModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 p-6 rounded-3xl w-full max-w-sm shadow-2xl">
+            <h3 id="modalTitle" class="text-lg font-bold mb-4 text-blue-400">নতুন ইউজার তথ্য</h3>
+            <input type="hidden" id="editId">
             <div class="space-y-4">
-                <input type="text" id="userName" placeholder="ইউজারের নাম লিখুন" class="w-full p-4 bg-slate-800 rounded-2xl outline-none border border-slate-700 focus:border-blue-500 transition-all shadow-inner">
-                
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="number" id="userAmount" placeholder="টাকার পরিমাণ" class="w-full p-4 bg-slate-800 rounded-2xl outline-none border border-slate-700 focus:border-blue-500 transition-all shadow-inner">
-                    <select id="userMonth" class="w-full p-4 bg-slate-800 rounded-2xl border border-slate-700 outline-none cursor-pointer">
-                        <option>ফেব্রুয়ারি ২০২৬</option>
-                        <option>মার্চ ২০২৬</option>
-                        <option>এপ্রিল ২০২৬</option>
-                        <option>মে ২০২৬</option>
-                    </select>
+                <input type="text" id="userName" placeholder="ইউজারের নাম" class="w-full p-4 bg-slate-800 rounded-xl outline-none border border-transparent focus:border-blue-500">
+                <input type="number" id="userAmount" placeholder="টাকার পরিমাণ" class="w-full p-4 bg-slate-800 rounded-xl outline-none border border-transparent focus:border-blue-500">
+                <select id="userMonth" class="w-full p-4 bg-slate-800 rounded-xl outline-none">
+                    <option>জানুয়ারি ২০২৬</option><option>ফেব্রুয়ারি ২০২৬</option>
+                    <option>মার্চ ২০২৬</option><option>এপ্রিল ২০২৬</option>
+                </select>
+                <div class="flex gap-2">
+                    <button onclick="handleUserSubmit()" id="saveBtn" class="bg-emerald-600 hover:bg-emerald-500 flex-1 p-4 rounded-xl font-bold transition-all">সেভ করুন</button>
+                    <button onclick="closeModal()" class="bg-slate-700 hover:bg-slate-600 p-4 rounded-xl font-bold transition-all">বাতিল</button>
                 </div>
-                
-                <button onclick="addUser()" class="w-full bg-blue-600 hover:bg-blue-500 active:scale-95 p-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-blue-900/20">
-                    সেভ করুন
-                </button>
             </div>
-        </div>
-
-        <div class="relative mb-6">
-            <input type="text" id="search" onkeyup="renderData()" placeholder="নাম দিয়ে দ্রুত খুঁজুন..." class="w-full p-4 pl-5 bg-slate-900 border border-slate-800 rounded-2xl outline-none focus:border-emerald-500 shadow-xl">
-        </div>
-
-        <div id="userList" class="space-y-3 mb-10">
-            </div>
-
-        <div class="text-center pb-10">
-            <button onclick="downloadBackup()" class="text-slate-500 text-xs underline hover:text-slate-300 transition">ডাটা ব্যাকআপ নিন (টেক্সট ফাইল)</button>
         </div>
     </div>
 
     <script>
-        // LocalStorage থেকে ডাটা লোড করা (ডাটাবেস)
-        let users = JSON.parse(localStorage.getItem('myHishabSystem_DB')) || [];
+        // ডাটাবেস (LocalStorage)
+        let users = JSON.parse(localStorage.getItem('billingDB_v2')) || [];
 
-        // ইউজার অ্যাড করার ফাংশন
-        function addUser() {
-            const nameInp = document.getElementById('userName');
-            const amountInp = document.getElementById('userAmount');
-            const monthInp = document.getElementById('userMonth');
+        // মোডাল খোলা/বন্ধ
+        function openAddModal() {
+            document.getElementById('modalTitle').innerText = "নতুন ইউজার যোগ করুন";
+            document.getElementById('editId').value = "";
+            document.getElementById('userName').value = "";
+            document.getElementById('userAmount').value = "";
+            document.getElementById('userModal').classList.add('active-modal');
+        }
 
-            const name = nameInp.value.trim();
-            const amount = amountInp.value.trim();
-            const month = monthInp.value;
+        function closeModal() {
+            document.getElementById('userModal').classList.remove('active-modal');
+        }
 
-            if (name === "" || amount === "") {
-                alert("দয়া করে নাম এবং টাকার পরিমাণ লিখুন!");
-                return;
+        // ইউজার অ্যাড বা এডিট হ্যান্ডলার
+        function handleUserSubmit() {
+            const id = document.getElementById('editId').value;
+            const name = document.getElementById('userName').value.trim();
+            const amount = document.getElementById('userAmount').value.trim();
+            const month = document.getElementById('userMonth').value;
+
+            if (!name || !amount) return alert("সব ঘর পূরণ করুন!");
+
+            if (id) {
+                // এডিট করা
+                users = users.map(u => u.id == id ? { ...u, name, amount, month } : u);
+            } else {
+                // নতুন অ্যাড করা
+                users.unshift({ id: Date.now(), name, amount, month, isPaid: false });
             }
 
-            const newUser = {
-                id: Date.now(),
-                name: name,
-                amount: amount,
-                month: month,
-                isPaid: false
-            };
-
-            users.unshift(newUser); // নতুন ডাটা সবার উপরে রাখবে
-            updateStorage();
-            
-            // ইনপুট রিসেট
-            nameInp.value = '';
-            amountInp.value = '';
+            saveAndRender();
+            closeModal();
         }
 
-        // পেইড স্ট্যাটাস পরিবর্তন (টিক মার্ক)
-        function togglePaid(id) {
-            users = users.map(u => {
-                if(u.id === id) u.isPaid = !u.isPaid;
-                return u;
-            });
-            updateStorage();
+        // এডিট মোড চালু
+        function editUser(id) {
+            const user = users.find(u => u.id == id);
+            document.getElementById('modalTitle').innerText = "তথ্য পরিবর্তন করুন";
+            document.getElementById('editId').value = user.id;
+            document.getElementById('userName').value = user.name;
+            document.getElementById('userAmount').value = user.amount;
+            document.getElementById('userMonth').value = user.month;
+            document.getElementById('userModal').classList.add('active-modal');
         }
 
-        // ইউজার ডিলিট করা
+        function toggleStatus(id) {
+            users = users.map(u => u.id === id ? { ...u, isPaid: !u.isPaid } : u);
+            saveAndRender();
+        }
+
         function deleteUser(id) {
-            if(confirm("আপনি কি নিশ্চিতভাবে এই ডাটাটি মুছতে চান?")) {
+            if (confirm("আপনি কি নিশ্চিতভাবে এই ইউজারটি মুছে ফেলতে চান?")) {
                 users = users.filter(u => u.id !== id);
-                updateStorage();
+                saveAndRender();
             }
         }
 
-        // ডাটা সেভ এবং রিফ্রেশ
-        function updateStorage() {
-            localStorage.setItem('myHishabSystem_DB', JSON.stringify(users));
+        function saveAndRender() {
+            localStorage.setItem('billingDB_v2', JSON.stringify(users));
             renderData();
         }
 
-        // লিস্ট রেন্ডার করা এবং সার্চ লজিক
         function renderData() {
-            const listContainer = document.getElementById('userList');
+            const dueList = document.getElementById('dueList');
+            const paidList = document.getElementById('paidList');
             const searchTxt = document.getElementById('search').value.toLowerCase();
-            listContainer.innerHTML = '';
+            
+            dueList.innerHTML = '';
+            paidList.innerHTML = '';
 
-            const filteredUsers = users.filter(u => u.name.toLowerCase().includes(searchTxt));
+            const filtered = users.filter(u => u.name.toLowerCase().includes(searchTxt));
 
-            filteredUsers.forEach(u => {
-                listContainer.innerHTML += `
-                    <div class="bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 shadow-md transition-all ${u.isPaid ? 'paid-bg' : ''}">
+            filtered.forEach(u => {
+                const cardClass = u.isPaid ? 'paid-card' : 'due-card';
+                const html = `
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex justify-between items-center shadow-lg transition-all ${cardClass}">
                         <div class="flex items-center gap-4">
-                            <input type="checkbox" ${u.isPaid ? 'checked' : ''} onclick="togglePaid(${u.id})" class="accent-emerald-500">
+                            <input type="checkbox" ${u.isPaid ? 'checked' : ''} onclick="toggleStatus(${u.id})">
                             <div>
-                                <h4 class="font-bold text-lg ${u.isPaid ? 'paid-text' : 'text-slate-100'}">${u.name}</h4>
-                                <p class="text-xs text-slate-500 ${u.isPaid ? 'text-emerald-200/50' : ''}">${u.month} | ${u.amount} টাকা</p>
+                                <h4 class="font-bold ${u.isPaid ? 'text-slate-400 line-through' : 'text-slate-100'}">${u.name}</h4>
+                                <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">${u.amount} TK | ${u.month}</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <span class="text-[10px] font-bold px-3 py-1 rounded-full ${u.isPaid ? 'bg-emerald-500 text-white' : 'bg-rose-600 text-white'}">
-                                ${u.isPaid ? 'পেইড' : 'বাকি'}
-                            </span>
-                            <button onclick="deleteUser(${u.id})" class="text-slate-600 hover:text-rose-500 p-2 text-xl">✕</button>
+                        <div class="flex items-center gap-2">
+                            <button onclick="editUser(${u.id})" class="p-2 bg-slate-800 rounded-lg text-blue-400 hover:bg-blue-600 hover:text-white transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                            </button>
+                            <button onclick="deleteUser(${u.id})" class="p-2 bg-slate-800 rounded-lg text-rose-500 hover:bg-rose-600 hover:text-white transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 `;
+                u.isPaid ? paidList.innerHTML += html : dueList.innerHTML += html;
             });
 
-            // রিপোর্ট কাউন্ট আপডেট
-            const paid = users.filter(u => u.isPaid).length;
-            document.getElementById('totalUsers').innerText = users.length;
-            document.getElementById('paidCount').innerText = paid;
-            document.getElementById('dueCount').innerText = users.length - paid;
+            // ড্যাশবোর্ড রিপোর্ট আপডেট
+            const paidCount = users.filter(u => u.isPaid).length;
+            document.getElementById('totalCount').innerText = users.length;
+            document.getElementById('paidCount').innerText = paidCount;
+            document.getElementById('dueCount').innerText = users.length - paidCount;
         }
 
-        // ডাটা ডাউনলোড ব্যাকআপ (সুরক্ষার জন্য)
-        function downloadBackup() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(users));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "hishab_backup_" + new Date().toLocaleDateString() + ".txt");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        }
-
-        // পেজ লোড হলে ডাটা দেখানো
         window.onload = renderData;
     </script>
 </body>
