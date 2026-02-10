@@ -3,100 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Secure Lock</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/otplib/12.0.1/otplib-browser.all.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>হিসাব খাতা প্রো - বিলিং সিস্টেম</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body {
-            background: #0f172a;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-        }
-        .login-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 24px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        .icon { font-size: 50px; margin-bottom: 20px; }
-        h2 { font-weight: 600; margin-bottom: 8px; letter-spacing: 1px; }
-        p { color: #94a3b8; font-size: 14px; margin-bottom: 30px; }
-        input {
-            width: 100%;
-            padding: 15px;
-            background: #0f172a;
-            border: 2px solid #334155;
-            border-radius: 12px;
-            color: #38bdf8;
-            font-size: 28px;
-            letter-spacing: 12px;
-            text-align: center;
-            outline: none;
-            transition: 0.3s;
-        }
-        input:focus { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.2); }
-        .status { margin-top: 20px; font-size: 14px; height: 20px; }
-        .success { color: #4ade80; }
-        .error { color: #f87171; }
+        /* কাস্টম ডিজাইন */
+        input[type="checkbox"] { transform: scale(1.4); cursor: pointer; }
+        .paid-bg { background-color: #064e3b !important; border-color: #059669 !important; }
+        .paid-text { color: #9ca3af; text-decoration: line-through; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     </style>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 p-4 min-h-screen">
 
-<div class="login-card">
-    <div class="icon">🔒</div>
-    <h2>সিস্টেম লক</h2>
-    <p>আপনার ফোনের অথেন্টিকেটর অ্যাপ থেকে কোডটি দিন</p>
-    
-    <input type="text" id="otpCode" maxlength="6" placeholder="000000" autocomplete="off" autofocus>
-    
-    <div id="statusMessage" class="status"></div>
-</div>
+    <div class="max-w-xl mx-auto">
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <div class="bg-blue-900/50 border border-blue-700 p-4 rounded-3xl text-center shadow-xl">
+                <p class="text-[10px] text-blue-300 uppercase tracking-widest font-bold">মোট ইউজার</p>
+                <h2 id="totalUsers" class="text-2xl font-black">0</h2>
+            </div>
+            <div class="bg-emerald-900/50 border border-emerald-700 p-4 rounded-3xl text-center shadow-xl">
+                <p class="text-[10px] text-emerald-300 uppercase tracking-widest font-bold">বেতন দিছে</p>
+                <h2 id="paidCount" class="text-2xl font-black text-emerald-400">0</h2>
+            </div>
+            <div class="bg-rose-900/50 border border-rose-700 p-4 rounded-3xl text-center shadow-xl">
+                <p class="text-[10px] text-rose-300 uppercase tracking-widest font-bold">বাকি আছে</p>
+                <h2 id="dueCount" class="text-2xl font-black text-rose-400">0</h2>
+            </div>
+        </div>
 
-<script>
-    // --- সেটিংস ---
-    const secret = 'JBSWY3DPEHPK3PXP'; // আপনার অ্যাপে এই কি-টি সেভ করবেন
-    const redirectUrl = 'https://google.com'; // কোড সঠিক হলে যেখানে যাবে (আপনার লিংক দিন)
+        <div class="bg-slate-900 p-6 rounded-[2.5rem] border border-slate-800 shadow-2xl mb-8">
+            <h3 class="text-blue-400 font-bold mb-4 flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span> নতুন ইউজার যোগ করুন
+            </h3>
+            <div class="space-y-4">
+                <input type="text" id="userName" placeholder="ইউজারের নাম লিখুন" class="w-full p-4 bg-slate-800 rounded-2xl outline-none border border-slate-700 focus:border-blue-500 transition-all shadow-inner">
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="number" id="userAmount" placeholder="টাকার পরিমাণ" class="w-full p-4 bg-slate-800 rounded-2xl outline-none border border-slate-700 focus:border-blue-500 transition-all shadow-inner">
+                    <select id="userMonth" class="w-full p-4 bg-slate-800 rounded-2xl border border-slate-700 outline-none cursor-pointer">
+                        <option>ফেব্রুয়ারি ২০২৬</option>
+                        <option>মার্চ ২০২৬</option>
+                        <option>এপ্রিল ২০২৬</option>
+                        <option>মে ২০২৬</option>
+                    </select>
+                </div>
+                
+                <button onclick="addUser()" class="w-full bg-blue-600 hover:bg-blue-500 active:scale-95 p-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-blue-900/20">
+                    সেভ করুন
+                </button>
+            </div>
+        </div>
 
-    const input = document.getElementById('otpCode');
-    const status = document.getElementById('statusMessage');
+        <div class="relative mb-6">
+            <input type="text" id="search" onkeyup="renderData()" placeholder="নাম দিয়ে দ্রুত খুঁজুন..." class="w-full p-4 pl-5 bg-slate-900 border border-slate-800 rounded-2xl outline-none focus:border-emerald-500 shadow-xl">
+        </div>
 
-    input.addEventListener('input', () => {
-        const code = input.value;
-        if (code.length === 6) {
-            verify(code);
+        <div id="userList" class="space-y-3 mb-10">
+            </div>
+
+        <div class="text-center pb-10">
+            <button onclick="downloadBackup()" class="text-slate-500 text-xs underline hover:text-slate-300 transition">ডাটা ব্যাকআপ নিন (টেক্সট ফাইল)</button>
+        </div>
+    </div>
+
+    <script>
+        // LocalStorage থেকে ডাটা লোড করা (ডাটাবেস)
+        let users = JSON.parse(localStorage.getItem('myHishabSystem_DB')) || [];
+
+        // ইউজার অ্যাড করার ফাংশন
+        function addUser() {
+            const nameInp = document.getElementById('userName');
+            const amountInp = document.getElementById('userAmount');
+            const monthInp = document.getElementById('userMonth');
+
+            const name = nameInp.value.trim();
+            const amount = amountInp.value.trim();
+            const month = monthInp.value;
+
+            if (name === "" || amount === "") {
+                alert("দয়া করে নাম এবং টাকার পরিমাণ লিখুন!");
+                return;
+            }
+
+            const newUser = {
+                id: Date.now(),
+                name: name,
+                amount: amount,
+                month: month,
+                isPaid: false
+            };
+
+            users.unshift(newUser); // নতুন ডাটা সবার উপরে রাখবে
+            updateStorage();
+            
+            // ইনপুট রিসেট
+            nameInp.value = '';
+            amountInp.value = '';
         }
-    });
 
-    function verify(userCode) {
-        // otplib ব্যবহার করে কোড যাচাই
-        const isValid = otplib.authenticator.check(userCode, secret);
-
-        if (isValid) {
-            status.innerHTML = '<span class="success">✔ সফল হয়েছে! আনলক হচ্ছে...</span>';
-            input.style.borderColor = '#4ade80';
-            setTimeout(() => {
-                window.location.href = redirectUrl;
-            }, 1000);
-        } else {
-            status.innerHTML = '<span class="error">✘ ভুল কোড, আবার চেষ্টা করুন</span>';
-            input.style.borderColor = '#f87171';
-            setTimeout(() => {
-                input.value = '';
-                input.style.borderColor = '#334155';
-                status.innerHTML = '';
-            }, 1000);
+        // পেইড স্ট্যাটাস পরিবর্তন (টিক মার্ক)
+        function togglePaid(id) {
+            users = users.map(u => {
+                if(u.id === id) u.isPaid = !u.isPaid;
+                return u;
+            });
+            updateStorage();
         }
-    }
-</script>
 
+        // ইউজার ডিলিট করা
+        function deleteUser(id) {
+            if(confirm("আপনি কি নিশ্চিতভাবে এই ডাটাটি মুছতে চান?")) {
+                users = users.filter(u => u.id !== id);
+                updateStorage();
+            }
+        }
+
+        // ডাটা সেভ এবং রিফ্রেশ
+        function updateStorage() {
+            localStorage.setItem('myHishabSystem_DB', JSON.stringify(users));
+            renderData();
+        }
+
+        // লিস্ট রেন্ডার করা এবং সার্চ লজিক
+        function renderData() {
+            const listContainer = document.getElementById('userList');
+            const searchTxt = document.getElementById('search').value.toLowerCase();
+            listContainer.innerHTML = '';
+
+            const filteredUsers = users.filter(u => u.name.toLowerCase().includes(searchTxt));
+
+            filteredUsers.forEach(u => {
+                listContainer.innerHTML += `
+                    <div class="bg-slate-900 p-5 rounded-3xl flex justify-between items-center border border-slate-800 shadow-md transition-all ${u.isPaid ? 'paid-bg' : ''}">
+                        <div class="flex items-center gap-4">
+                            <input type="checkbox" ${u.isPaid ? 'checked' : ''} onclick="togglePaid(${u.id})" class="accent-emerald-500">
+                            <div>
+                                <h4 class="font-bold text-lg ${u.isPaid ? 'paid-text' : 'text-slate-100'}">${u.name}</h4>
+                                <p class="text-xs text-slate-500 ${u.isPaid ? 'text-emerald-200/50' : ''}">${u.month} | ${u.amount} টাকা</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="text-[10px] font-bold px-3 py-1 rounded-full ${u.isPaid ? 'bg-emerald-500 text-white' : 'bg-rose-600 text-white'}">
+                                ${u.isPaid ? 'পেইড' : 'বাকি'}
+                            </span>
+                            <button onclick="deleteUser(${u.id})" class="text-slate-600 hover:text-rose-500 p-2 text-xl">✕</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // রিপোর্ট কাউন্ট আপডেট
+            const paid = users.filter(u => u.isPaid).length;
+            document.getElementById('totalUsers').innerText = users.length;
+            document.getElementById('paidCount').innerText = paid;
+            document.getElementById('dueCount').innerText = users.length - paid;
+        }
+
+        // ডাটা ডাউনলোড ব্যাকআপ (সুরক্ষার জন্য)
+        function downloadBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(users));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "hishab_backup_" + new Date().toLocaleDateString() + ".txt");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // পেজ লোড হলে ডাটা দেখানো
+        window.onload = renderData;
+    </script>
 </body>
 </html>
