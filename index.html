@@ -3,91 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ListerPro - Ultra Secure Offline Sync</title>
+    <title>ListerPro - Secure Sync Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
-        
-        /* প্রিমিয়াম লগইন ও মোডাল ডিজাইন */
-        #loginOverlay, .delete-pass-overlay { position: fixed; inset: 0; z-index: 500; background: #000; display: flex; align-items: center; justify-content: center; }
-        .login-card, .delete-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); padding: 2.5rem; border-radius: 3rem; border: 1px solid rgba(255, 255, 255, 0.1); width: 90%; max-width: 380px; text-align: center; position: relative; }
-        .inner-bg { position: absolute; inset: 2px; background: #000; border-radius: 3rem; z-index: -1; }
-        .login-card::before { content: ''; position: absolute; inset: -2px; background: conic-gradient(transparent, transparent, #3b82f6); animation: spin 4s linear infinite; z-index: -2; border-radius: 3.1rem; }
+        #loginOverlay { position: fixed; inset: 0; z-index: 1000; background: #000; display: flex; align-items: center; justify-content: center; }
+        .login-card, .pass-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); padding: 2.5rem; border-radius: 3rem; border: 1px solid rgba(255, 255, 255, 0.1); width: 90%; max-width: 380px; text-align: center; position: relative; }
+        .login-card::before { content: ''; position: absolute; inset: -2px; background: conic-gradient(transparent, transparent, #3b82f6); animation: spin 4s linear infinite; z-index: -1; border-radius: 3.1rem; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        .pass-input { background: #0a0a0a; border: 1px solid #222; color: #fff; padding: 1rem; border-radius: 1.2rem; width: 100%; text-align: center; font-size: 1.5rem; letter-spacing: 5px; outline: none; }
-        .pass-input:focus { border-color: #3b82f6; }
-
+        .inner-bg { position: absolute; inset: 2px; background: #000; border-radius: 3rem; z-index: -1; }
         #appContent { display: none; }
-        .user-card { background: #050505; border: 1px solid #111; border-radius: 20px; margin-bottom: 10px; position: relative; overflow: hidden; transition: 0.2s; }
+        .user-card { background: #050505; border: 1px solid #111; border-radius: 20px; margin-bottom: 10px; position: relative; overflow: hidden; }
         .pressing { position: absolute; bottom: 0; left: 0; height: 4px; background: #3b82f6; animation: loading 1.5s linear forwards; }
         @keyframes loading { from { width: 0%; } to { width: 100%; } }
-        
-        #syncStatus { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; font-size: 10px; font-weight: bold; padding: 6px 16px; border-radius: 20px; display: none; }
-        .modal { display: none; position: fixed; inset: 0; z-index: 600; align-items: center; justify-content: center; background: rgba(0,0,0,0.95); backdrop-filter: blur(15px); }
+        .tab-btn { transition: 0.3s; color: #444; font-size: 13px; font-weight: 800; border-bottom: 2px solid transparent; padding-bottom: 5px; }
+        .tab-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+        .sticky-header { position: sticky; top: 0; background: #000; z-index: 100; padding-top: 10px; }
+        .modal { display: none; position: fixed; inset: 0; z-index: 600; align-items: center; justify-content: center; background: rgba(0,0,0,0.96); backdrop-filter: blur(15px); }
         .active-modal { display: flex; }
     </style>
 </head>
 <body>
 
-    <div id="syncStatus" class="bg-blue-600 text-white shadow-xl shadow-blue-900/40"></div>
-
     <div id="loginOverlay">
         <div class="login-card">
             <div class="inner-bg"></div>
-            <div class="w-20 h-20 bg-blue-600 rounded-[2rem] mx-auto mb-6 flex items-center justify-center shadow-2xl shadow-blue-500/30">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+            <div class="w-16 h-16 bg-blue-600 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-2xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
             </div>
-            <h2 class="text-3xl font-black mb-1 italic tracking-tight">Lister<span class="text-blue-500">Pro</span></h2>
-            <p class="text-gray-500 text-[10px] mb-8 uppercase tracking-[4px]">System Secured</p>
-            <input type="password" id="passCode" class="pass-input mb-6" placeholder="••••" maxlength="8">
-            <button onclick="checkPass()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold text-lg active:scale-95 transition-all shadow-lg shadow-blue-900/40">UNLOCK</button>
+            <h2 class="text-2xl font-black italic mb-6 uppercase tracking-tighter">Lister Pro</h2>
+            <input type="password" id="passCode" class="w-full bg-zinc-900 border border-zinc-800 p-4 rounded-2xl text-center text-2xl tracking-[5px] text-white outline-none mb-6" placeholder="••••" maxlength="8">
+            <button onclick="checkPass()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold active:scale-95 transition-all">ACCESS SYSTEM</button>
         </div>
     </div>
 
-    <div id="deletePassModal" class="modal">
-        <div class="delete-card">
-            <h2 class="text-rose-500 font-black text-xl mb-4">CONFIRM DELETE</h2>
-            <p class="text-gray-400 text-xs mb-6 uppercase">নিরাপত্তার জন্য পাসওয়ার্ড দিন</p>
-            <input type="password" id="delPassCode" class="pass-input mb-6" placeholder="••••" maxlength="8">
+    <div id="passVerifyModal" class="modal">
+        <div class="pass-card">
+            <h2 id="verifyTitle" class="text-white font-black text-xl mb-4 italic uppercase">Verify Action</h2>
+            <p id="verifyDesc" class="text-gray-400 text-[10px] mb-6 tracking-widest uppercase">নিরাপত্তার জন্য পাসওয়ার্ড দিন</p>
+            <input type="password" id="universalPass" class="w-full bg-zinc-900 p-4 rounded-2xl text-center text-white text-2xl tracking-[8px] outline-none mb-6 border border-zinc-800" placeholder="••••" maxlength="8">
             <div class="flex gap-4">
-                <button onclick="closeDeleteModal()" class="w-1/2 bg-zinc-900 text-white py-4 rounded-2xl font-bold text-xs uppercase">Cancel</button>
-                <button onclick="verifyAndDelete()" class="w-1/2 bg-rose-600 text-white py-4 rounded-2xl font-bold text-xs uppercase">Delete</button>
+                <button onclick="closeVerifyModal()" class="w-1/2 bg-zinc-800 py-4 rounded-2xl font-bold text-xs">CANCEL</button>
+                <button onclick="executeVerifiedAction()" class="w-1/2 bg-blue-600 py-4 rounded-2xl font-bold text-xs shadow-lg shadow-blue-900/40">CONFIRM</button>
             </div>
         </div>
     </div>
 
     <div id="appContent" class="p-4">
         <div class="max-w-md mx-auto">
-            <input type="text" id="searchInput" oninput="renderData()" placeholder="ইউজার খুঁজুন..." class="w-full p-5 bg-[#0a0a0a] border border-gray-800 rounded-3xl text-white outline-none mb-6 shadow-inner focus:border-blue-600 transition-all">
-            
-            <div class="flex justify-between items-center mb-6 px-2">
-                <h1 class="text-2xl font-black italic text-blue-600 tracking-tighter uppercase">Lister<span class="text-white">Pro</span></h1>
-                <button onclick="openAddModal()" class="w-12 h-12 bg-white text-black rounded-full font-bold text-3xl shadow-xl active:scale-90 transition-all">+</button>
+            <div class="sticky-header">
+                <div class="relative mb-6">
+                    <input type="text" id="searchInput" oninput="renderData()" placeholder="ইউজার খুঁজুন..." class="w-full p-5 bg-[#0a0a0a] border border-gray-800 rounded-[1.8rem] text-white outline-none focus:border-blue-600">
+                    <button onclick="askUniversalPass('reset_all')" class="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-rose-600/20 text-rose-500 rounded-full border border-rose-500/30 font-black text-xs shadow-lg">✕</button>
+                </div>
+                
+                <div class="flex justify-between items-center mb-6 px-2">
+                    <h1 class="text-2xl font-black italic text-blue-600">LISTER<span class="text-white">PRO</span></h1>
+                    <button onclick="openAddModal()" class="w-12 h-12 bg-white text-black rounded-full font-bold text-3xl shadow-lg">+</button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 text-center mb-6">
+                    <div class="bg-[#0a0a0a] p-3 rounded-2xl border border-gray-900">
+                        <p class="text-[8px] text-gray-500 font-black uppercase">Total</p>
+                        <h2 id="totalCount" class="text-xl font-bold">0</h2>
+                    </div>
+                    <div class="bg-[#0a0a0a] p-3 rounded-2xl border border-gray-900">
+                        <p class="text-[8px] text-emerald-500 font-black uppercase text-glow">Paid</p>
+                        <h2 id="paidCount" class="text-xl font-bold text-emerald-500">0</h2>
+                    </div>
+                    <div class="bg-[#0a0a0a] p-3 rounded-2xl border border-gray-900">
+                        <p class="text-[8px] text-rose-500 font-black uppercase">Due</p>
+                        <h2 id="dueCount" class="text-xl font-bold text-rose-500">0</h2>
+                    </div>
+                </div>
+
+                <div class="flex gap-8 px-2 border-b border-gray-900 overflow-x-auto whitespace-nowrap mb-4">
+                    <button onclick="switchTab('all')" id="tab-all" class="tab-btn active">সবাই</button>
+                    <button onclick="switchTab('due')" id="tab-due" class="tab-btn">বাকি</button>
+                    <button onclick="switchTab('paid')" id="tab-paid" class="tab-btn">পেইড</button>
+                    <button onclick="openReportModal()" class="tab-btn text-orange-500">REPORT 📢</button>
+                </div>
             </div>
 
-            <div id="userList" class="pb-32"></div>
+            <div id="userList" class="pb-32 mt-4"></div>
         </div>
     </div>
 
     <div id="actionModal" class="modal">
-        <div class="bg-[#080808] w-[85%] p-8 rounded-[3rem] border border-gray-800 relative shadow-2xl">
+        <div class="bg-[#080808] w-[88%] p-8 rounded-[3rem] border border-gray-800 relative shadow-2xl">
             <button onclick="closeActionModal()" class="absolute -top-3 -right-3 w-12 h-12 bg-rose-600 text-white rounded-full font-bold border-4 border-black">X</button>
             <h3 id="targetName" class="text-center text-xl font-bold mb-8 italic text-blue-400">নাম</h3>
             <div class="space-y-4">
-                <button onclick="askDeletePass()" class="w-full bg-rose-950/20 text-rose-500 p-5 rounded-2xl font-bold border border-rose-900/30 uppercase text-[10px] tracking-[2px]">🗑 ইউজার ডিলিট</button>
-                <button id="statusActionBtn" onclick="handleStatusToggle()" class="w-full bg-emerald-600 text-white p-5 rounded-2xl font-bold text-lg">সাকসেস</button>
+                <button onclick="askUniversalPass('delete')" class="w-full bg-rose-950/20 text-rose-500 p-5 rounded-2xl font-bold border border-rose-900/30 uppercase text-[10px] tracking-[2px]">🗑 ডিলিট ইউজার</button>
+                <button id="statusActionBtn" onclick="askUniversalPass('toggle_status')" class="w-full bg-emerald-600 text-white p-5 rounded-2xl font-bold text-lg">বিল সাকসেস</button>
                 <button onclick="handleEditClick()" class="w-full bg-gray-900 text-white p-5 rounded-2xl font-bold border border-gray-800">এডিট নাম</button>
             </div>
         </div>
     </div>
 
     <div id="dataModal" class="modal">
-        <div class="bg-[#080808] w-[88%] p-10 rounded-[3rem] border border-gray-800">
+        <div class="bg-[#080808] w-[88%] p-8 rounded-[3rem] border border-zinc-800">
             <input type="hidden" id="editId">
-            <input type="text" id="userNameInput" placeholder="নাম লিখুন..." class="w-full p-5 bg-black border border-zinc-800 rounded-2xl text-center text-white mb-6 outline-none text-xl">
+            <input type="text" id="userNameInput" placeholder="ইউজার নাম..." class="w-full p-5 bg-black border border-zinc-800 rounded-2xl text-center text-white mb-6 outline-none">
             <button onclick="saveUser()" class="w-full bg-white text-black p-5 rounded-2xl font-black uppercase tracking-widest">সেভ করুন</button>
-            <button onclick="closeDataModal()" class="w-full text-zinc-600 font-bold text-xs mt-6 uppercase text-center block">বাতিল</button>
         </div>
     </div>
 
@@ -96,117 +114,96 @@
         const BOT_TOKEN = "7885791804:AAHQjsAsMuBfvVqWga0hub2m0QZ7BrgsAsc"; 
         const CHAT_ID = "5923885908";
 
-        let users = JSON.parse(localStorage.getItem('billingFinalV35')) || [];
-        let offlineQueue = JSON.parse(localStorage.getItem('offlineQueue')) || [];
-        let activeUserId = null, holdTimer, currentTab = 'all';
-
-        // ২৭৯ নাম যদি ডাটাবেজ খালি থাকে
-        const defaultNames = ["কাজল","সুনীল","শাওন","ফরিদ","আইয়ুব","পারভেজ ১","দিপু","শান্তি","আলামিন","মিজান","আনোয়ার","রোকন","শাহাবুদ্দিন","জনি","অফিস","রাফিন","দুর্জয়","সাইফা","জেরিন","মাহাদি","রিদয় ১","মোবারক","ইমন ১","ইমরান","মোবারক ২","রিদয়","আনন্দ","ইয়াকুব","নাবিল","জাকির ২","সাগর","শাকিল ৩","রুস্তম","হাশেম","আশরাফুল","দীপ্ত","হামিদুল","আজাহার ১","নবাব","বিজয়","নজরুল","মোতালেব","এস কে মানিক","আজাহার","কাশেম আমিরুল","রতন ১","সপ্না","বাদল","রাফেজা","রেজাউল","সিয়াম","মাসুদ","আলামিন ১","মঞ্জু ১","সারোয়ার","সোহেল","ঝুমা ১","জসিম ১","রোকেয়া","সুমন ২","মোফাজ্জল ১","মোফাজ্জল ০","রায়হান","পলাশ","মালেক","মুরাদ","সিয়াম ২","জুয়েল ১","মোজাম","সাব্বির","আরাফাত","জাকির","গোলাম মোস্তফা","জুলহাস","উজ্জল","সুমন","জাহাঙ্গীর ১","খায়রুল ১","কাকন","শাকিল ২","হাবিবুল্লাহ","আজিজ","নজরুল","হাসান","মাহি","মাই","রুপা","সবুজ","সুমন ১","হবি","আলামিন ২","সাদমান","সোহেল ৪","হালিম","মঞ্জু","নুর ইসলাম","আজহারুল","ফরহাদ","ফরহাদ ১","সেলিম","লিয়াকত","জহিরুল","তানভীর","রিফাত ৩","ইমন","আশিকুর","সিয়াম","সোনিয়া ২","সিদ্দিক","জাহাঙ্গীর","জুবায়ের","পরান","সেলিম ভাই","মুয়াজ","শাহীন ১","নুরুল আমিন","অনিক","দুলাল","রাজু","হুমায়ুন","রিদয়","মনির","মোশারফ","সোনিয়া","সাকিবুল","শান্ত ২","রুবেল","পারভেজ","পলাশ","মাসুদ ১","সুমন ২","শহীদুল্লাহ","রিফাত বিলা","রমজান","রিদওয়ান","আলমগীর","ফারুক ১","মানিক","ফাহিম","রাসেল","রিমন","শাহানাজ","হিরন","সাহানাজ","আবুবক্কর","বিলকিস","জুমা","মুসেদ","ডিকে নাহিদ","রমা","সুহেল","রাকিব","ফারুক ২","রফিকুল","নাসরিন","সুজন","রহিম","অপু","শফিকুল","মিল্লাত","রতন","হেলাল","আনোয়ার আদিবা","আসিফ","শফিকুল","আজিমউদ্দিন","কাউসার","জসিম","আসাদুল","মুজিবর","রিদয়","আসাদ","অরুণ","শরিফুল","খোঁজরুল আলম","শফিকুল ১","হারুন","রাব্বি ১","জামাল","রাব্বি ২","মারুফ","রাসেল ৩","মিনা","জালাল","দুলাল","হান্নান ১","এমদাদুল","মোকসেদুল","ফারুক","জুয়েল","আলম ১","নাঈম","নাদিয়া","আজগর","রশিদ","রাসেল","তানা হামিদ","কালাম","শুভ","হুমায়ুন","মুকুল","মিজান","পারভেজ","মিম","আলম","হিশাম","দেলোয়ার","উজ্জল","রফিক ১","ইসমাইল","আনিস","রুনু","মামুন ১","জান্নাত","মঞ্জু ১","মনির","রোজা","কামরুল","মনির ২","জাকির ৩","মুক্তা","সোহাগ","আরিফ","তুহিন","মোবারক ৩","ফারুক","পলাশ","মমিদুল","রিপন","রোকন","আসিফ ১","সুমন","খালেক","মরিয়ম","রাজিব","শাহীন","তামিম","শিপন","বিপ্লব","আল রাজি","রাব্বি ১","রোজা","রিয়াদ","সোহেল","শফিকুল ১","রিদয়২","নাঈম","খাইরুল ২","মনির","মোশারফ ১","সপ্না","কাফি","শরিফুল ১","মর্জিনা","আলিম","রাশেদ","জসিম ২","সুলতানা","শামীম","আলিম","মুস্তাফিজুর","মিরাজ","সুমন","মাহাদি","আলামিন","শুভ","পিয়াল","পিয়াল","রাব্বি","রোহান","রফিক","ইয়াসিন","সোহেল","অন্টার","জহির মামা","বাবলু","জয়"];
-
-        if (users.length === 0) {
-            users = defaultNames.map((n, i) => ({ id: Date.now() + i, name: n, isPaid: false }));
-            localStorage.setItem('billingFinalV35', JSON.stringify(users));
-        }
+        let users = JSON.parse(localStorage.getItem('billingFinalV50')) || [];
+        let activeUserId = null, holdTimer, currentTab = 'all', pendingAction = null;
 
         // অথেন্টিকেশন
         function checkPass() {
             if(document.getElementById('passCode').value === PIN) {
                 sessionStorage.setItem('lister_auth', 'active');
                 unlock();
-            } else { alert("Wrong Password!"); }
+            } else { alert("ভুল পাসওয়ার্ড!"); }
         }
 
         function unlock() {
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('appContent').style.display = 'block';
             renderData();
-            processQueue();
         }
 
-        // ডিলিট সিকিউরিটি লজিক
-        function askDeletePass() {
+        // সিকিউরিটি ম্যানেজমেন্ট
+        function askUniversalPass(actionType) {
+            pendingAction = actionType;
             closeActionModal();
-            document.getElementById('deletePassModal').classList.add('active-modal');
-            document.getElementById('delPassCode').focus();
+            document.getElementById('verifyTitle').innerText = 
+                actionType === 'delete' ? "Confirm Delete" : 
+                actionType === 'reset_all' ? "Reset All Users" : "Confirm Success";
+            document.getElementById('passVerifyModal').classList.add('active-modal');
+            document.getElementById('universalPass').focus();
         }
 
-        function closeDeleteModal() {
-            document.getElementById('deletePassModal').classList.remove('active-modal');
-            document.getElementById('delPassCode').value = '';
+        function closeVerifyModal() {
+            document.getElementById('passVerifyModal').classList.remove('active-modal');
+            document.getElementById('universalPass').value = '';
+            pendingAction = null;
         }
 
-        function verifyAndDelete() {
-            const input = document.getElementById('delPassCode').value;
-            if (input === PIN) {
-                users = users.filter(u => u.id !== activeUserId);
+        function executeVerifiedAction() {
+            if (document.getElementById('universalPass').value === PIN) {
+                if (pendingAction === 'delete') deleteUser();
+                else if (pendingAction === 'toggle_status') toggleStatus();
+                else if (pendingAction === 'reset_all') resetAll();
+                closeVerifyModal();
+            } else { alert("ভুল পাসওয়ার্ড!"); }
+        }
+
+        // কোর ফাংশনস
+        function deleteUser() {
+            users = users.filter(u => u.id !== activeUserId);
+            saveAndRender();
+        }
+
+        async function toggleStatus() {
+            const user = users.find(u => u.id === activeUserId);
+            user.isPaid = !user.isPaid;
+            saveAndRender();
+            if (user.isPaid) {
+                const msg = `✅ *বিল সাকসেস*\n👤 ${user.name}\n⏰ ${new Date().toLocaleTimeString('bn-BD')}`;
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`);
+            }
+        }
+
+        function resetAll() {
+            if(confirm("সব ইউজারকে আবার 'বাকি' (Unpaid) করতে চান?")) {
+                users.forEach(u => u.isPaid = false);
                 saveAndRender();
-                closeDeleteModal();
-                alert("ইউজার সফলভাবে ডিলিট হয়েছে।");
-            } else {
-                alert("ভুল পাসওয়ার্ড! ডিলিট করা সম্ভব নয়।");
+                alert("সব ইউজারকে 'বাকি' করা হয়েছে।");
             }
         }
 
-        // অফলাইন সিঙ্ক এবং টেলিগ্রাম
-        async function sendToTelegram(msg) {
-            if (!navigator.onLine) {
-                offlineQueue.push({ msg, id: Date.now() });
-                localStorage.setItem('offlineQueue', JSON.stringify(offlineQueue));
-                updateSyncStatus();
-                return;
-            }
-            try {
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`);
-            } catch (e) {
-                offlineQueue.push({ msg, id: Date.now() });
-                localStorage.setItem('offlineQueue', JSON.stringify(offlineQueue));
-            }
-        }
-
-        async function processQueue() {
-            if (!navigator.onLine || offlineQueue.length === 0) return;
-            const tempQueue = [...offlineQueue];
-            for (let item of tempQueue) {
-                try {
-                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(item.msg)}&parse_mode=Markdown`);
-                    offlineQueue = offlineQueue.filter(i => i.id !== item.id);
-                    localStorage.setItem('offlineQueue', JSON.stringify(offlineQueue));
-                } catch (e) { break; }
-            }
-            updateSyncStatus();
-        }
-
-        function updateSyncStatus() {
-            const status = document.getElementById('syncStatus');
-            if (offlineQueue.length > 0) {
-                status.style.display = 'block';
-                status.innerText = `${offlineQueue.length}টি ডাটা পেন্ডিং (Syncing...)`;
-            } else { status.style.display = 'none'; }
-        }
-
-        // ইউজার লিস্ট রেন্ডারিং
         function renderData() {
             const listDiv = document.getElementById('userList');
             const searchVal = document.getElementById('searchInput').value.toLowerCase();
-            let filtered = users.filter(u => u.name.toLowerCase().includes(searchVal));
-
-            let html = '';
-            filtered.forEach((u, index) => {
-                html += `
-                    <div class="user-card p-6 flex justify-between items-center" 
-                         ontouchstart="onTouchStart(${u.id}, this)" ontouchend="onTouchEnd(this)" 
-                         onmousedown="onTouchStart(${u.id}, this)" onmouseup="onTouchEnd(this)">
-                        <div class="flex items-center">
-                            <span class="text-blue-500 font-black mr-4 text-xs">${index + 1}.</span>
-                            <h4 class="text-white font-bold text-lg ${u.isPaid ? 'opacity-20 line-through' : ''}">${u.name}</h4>
-                        </div>
-                        <div class="w-3 h-3 rounded-full ${u.isPaid ? 'bg-emerald-500 shadow-[0_0_10px_#10b981]' : 'bg-rose-600 shadow-[0_0_10px_#e11d48]'}"></div>
-                    </div>`;
+            let filtered = users.filter(u => {
+                const matchTab = (currentTab === 'due') ? !u.isPaid : (currentTab === 'paid') ? u.isPaid : true;
+                return matchTab && u.name.toLowerCase().includes(searchVal);
             });
-            listDiv.innerHTML = html;
+
+            listDiv.innerHTML = filtered.map((u, i) => `
+                <div class="user-card p-6 flex justify-between items-center" 
+                     ontouchstart="onTouchStart(${u.id}, this)" ontouchend="onTouchEnd(this)">
+                    <div class="flex items-center">
+                        <span class="text-blue-500 font-black mr-4 text-xs">${i + 1}.</span>
+                        <h4 class="text-white font-bold text-lg ${u.isPaid ? 'opacity-20 line-through' : ''}">${u.name}</h4>
+                    </div>
+                    <div class="w-3 h-3 rounded-full ${u.isPaid ? 'bg-emerald-500 shadow-[0_0_10px_#10b981]' : 'bg-rose-600 shadow-[0_0_10px_#e11d48]'}"></div>
+                </div>`).join('');
+
+            document.getElementById('totalCount').innerText = users.length;
+            document.getElementById('paidCount').innerText = users.filter(u => u.isPaid).length;
+            document.getElementById('dueCount').innerText = users.filter(u => !u.isPaid).length;
         }
 
-        // হোল্ড লজিক
         function onTouchStart(id, element) {
             activeUserId = id;
             const loader = document.createElement('div');
@@ -215,7 +212,7 @@
             holdTimer = setTimeout(() => {
                 const user = users.find(u => u.id === id);
                 document.getElementById('targetName').innerText = user.name;
-                document.getElementById('statusActionBtn').innerText = user.isPaid ? "পেন্ডিং করুন" : "সাকসেস করুন";
+                document.getElementById('statusActionBtn').innerText = user.isPaid ? "বাকি করুন" : "সাকসেস করুন";
                 document.getElementById('actionModal').classList.add('active-modal');
                 if(navigator.vibrate) navigator.vibrate(50);
                 loader.remove();
@@ -228,23 +225,18 @@
             if(loader) loader.remove();
         }
 
-        // অ্যাকশন ফাংশনস
-        async function handleStatusToggle() {
-            const user = users.find(u => u.id === activeUserId);
-            user.isPaid = !user.isPaid;
-            saveAndRender();
-            closeActionModal();
-            if (user.isPaid) await sendToTelegram(`✅ *বিল সাকসেস*\n👤 ${user.name}\n⏰ ${new Date().toLocaleTimeString('bn-BD')}`);
-        }
-
-        function handleEditClick() {
+        function saveAndRender() { localStorage.setItem('billingFinalV50', JSON.stringify(users)); renderData(); }
+        function closeActionModal() { document.getElementById('actionModal').classList.remove('active-modal'); }
+        function switchTab(t) { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); renderData(); }
+        function openAddModal() { document.getElementById('editId').value=""; document.getElementById('userNameInput').value=""; document.getElementById('dataModal').classList.add('active-modal'); }
+        function closeDataModal() { document.getElementById('dataModal').classList.remove('active-modal'); }
+        function handleEditClick() { 
             const user = users.find(u => u.id === activeUserId);
             document.getElementById('editId').value = user.id;
             document.getElementById('userNameInput').value = user.name;
             closeActionModal();
             document.getElementById('dataModal').classList.add('active-modal');
         }
-
         function saveUser() {
             const name = document.getElementById('userNameInput').value.trim();
             const id = document.getElementById('editId').value;
@@ -255,13 +247,7 @@
             closeDataModal();
         }
 
-        function saveAndRender() { localStorage.setItem('billingFinalV35', JSON.stringify(users)); renderData(); }
-        function closeActionModal() { document.getElementById('actionModal').classList.remove('active-modal'); }
-        function closeDataModal() { document.getElementById('dataModal').classList.remove('active-modal'); }
-        function openAddModal() { document.getElementById('editId').value=""; document.getElementById('userNameInput').value=""; document.getElementById('dataModal').classList.add('active-modal'); }
-
-        window.addEventListener('online', processQueue);
-        window.onload = () => { if(sessionStorage.getItem('lister_auth') === 'active') unlock(); updateSyncStatus(); };
+        window.onload = () => { if(sessionStorage.getItem('lister_auth') === 'active') unlock(); };
     </script>
 </body>
 </html>
