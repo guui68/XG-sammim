@@ -3,89 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ListerPro - Full Database</title>
+    <title>ListerPro - Fast Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
-        .modal { display: none; position: fixed; inset: 0; z-index: 50; align-items: center; justify-content: center; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); }
+        .modal { display: none; position: fixed; inset: 0; z-index: 50; align-items: center; justify-content: center; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); }
         .active-modal { display: flex; }
-        .user-card { transition: 0.3s; border: 1px solid #111; position: relative; overflow: hidden; background: #050505; border-radius: 20px; }
-        .user-serial { color: #3b82f6; font-weight: 900; font-size: 16px; margin-right: 12px; min-width: 35px; }
-        .user-name-text { color: #ffffff !important; font-weight: 700; font-size: 18px; }
-        .success-tag { position: absolute; top: 0; right: 0; background: #10b981; color: #000; font-size: 8px; font-weight: 900; padding: 3px 10px; border-bottom-left-radius: 12px; text-transform: uppercase; }
-        .tab-btn { transition: 0.3s; color: #444; font-size: 13px; font-weight: 700; border-bottom: 2px solid transparent; }
+        .user-card { transition: 0.2s; border: 1px solid #111; position: relative; background: #050505; border-radius: 15px; margin-bottom: 8px; }
+        .user-serial { color: #3b82f6; font-weight: 800; font-size: 14px; margin-right: 10px; min-width: 30px; }
+        .user-name-text { color: #ffffff !important; font-weight: 600; font-size: 17px; }
+        .success-tag { position: absolute; top: 0; right: 0; background: #10b981; color: #000; font-size: 7px; font-weight: 900; padding: 2px 8px; border-bottom-left-radius: 10px; }
+        .tab-btn { transition: 0.2s; color: #444; font-size: 13px; font-weight: 700; border-bottom: 2px solid transparent; padding-bottom: 10px; }
         .tab-btn.active { color: #3b82f6; border-bottom: 2px solid #3b82f6; }
+        #userList { content-visibility: auto; } /* বড় লিস্টের পারফরম্যান্স বাড়ানোর জন্য */
     </style>
 </head>
-<body class="p-4 min-h-screen">
+<body class="p-4">
 
     <div class="max-w-md mx-auto">
-        <div class="flex justify-between items-center mb-10 pt-4 px-2">
-            <h1 class="text-xl font-black italic tracking-tighter uppercase text-blue-600">Lister<span class="text-white">Pro</span></h1>
-            <button onclick="openAddModal()" class="w-12 h-12 bg-white text-black rounded-full font-bold text-3xl shadow-xl">+</button>
+        <div class="flex justify-between items-center mb-6 pt-2 px-2">
+            <h1 class="text-xl font-black italic uppercase text-blue-600">Lister<span class="text-white">Pro</span></h1>
+            <button onclick="openAddModal()" class="w-10 h-10 bg-white text-black rounded-full font-bold text-2xl shadow-lg">+</button>
         </div>
 
-        <div class="grid grid-cols-3 gap-3 mb-10">
-            <div class="bg-[#0a0a0a] p-4 rounded-3xl text-center border border-gray-900">
-                <p class="text-[8px] text-gray-500 uppercase font-black mb-1">Total</p>
-                <h2 id="totalCount" class="text-xl font-bold text-white">0</h2>
+        <div class="grid grid-cols-3 gap-2 mb-6">
+            <div class="bg-[#0a0a0a] p-3 rounded-2xl text-center border border-gray-900">
+                <p class="text-[7px] text-gray-500 uppercase font-black">Total</p>
+                <h2 id="totalCount" class="text-lg font-bold">0</h2>
             </div>
-            <div class="bg-[#0a0a0a] p-4 rounded-3xl text-center border border-gray-900">
-                <p class="text-[8px] text-emerald-500 uppercase font-black mb-1">Paid</p>
-                <h2 id="paidCount" class="text-xl font-bold text-emerald-500">0</h2>
+            <div class="bg-[#0a0a0a] p-3 rounded-2xl text-center border border-gray-900">
+                <p class="text-[7px] text-emerald-500 uppercase font-black">Paid</p>
+                <h2 id="paidCount" class="text-lg font-bold text-emerald-500">0</h2>
             </div>
-            <div class="bg-[#0a0a0a] p-4 rounded-3xl text-center border border-gray-900">
-                <p class="text-[8px] text-rose-500 uppercase font-black mb-1">Due</p>
-                <h2 id="dueCount" class="text-xl font-bold text-rose-500">0</h2>
+            <div class="bg-[#0a0a0a] p-3 rounded-2xl text-center border border-gray-900">
+                <p class="text-[7px] text-rose-500 uppercase font-black">Due</p>
+                <h2 id="dueCount" class="text-lg font-bold text-rose-500">0</h2>
             </div>
         </div>
 
-        <div class="flex gap-6 mb-8 px-2 border-b border-gray-900 overflow-x-auto whitespace-nowrap">
-            <button onclick="switchTab('all')" id="tab-all" class="tab-btn active pb-4">সবাই</button>
-            <button onclick="switchTab('due')" id="tab-due" class="tab-btn pb-4">বাকি</button>
-            <button onclick="switchTab('paid')" id="tab-paid" class="tab-btn pb-4">পেইড</button>
-            <button onclick="openReportModal()" class="tab-btn pb-4 text-orange-500">REPORT 📢</button>
+        <div class="flex gap-6 mb-6 px-2 border-b border-gray-900 overflow-x-auto">
+            <button onclick="switchTab('all')" id="tab-all" class="tab-btn active">সবাই</button>
+            <button onclick="switchTab('due')" id="tab-due" class="tab-btn">বাকি</button>
+            <button onclick="switchTab('paid')" id="tab-paid" class="tab-btn">পেইড</button>
+            <button onclick="openReportModal()" class="tab-btn text-orange-500">REPORT 📢</button>
         </div>
 
-        <div id="userList" class="space-y-4 pb-24"></div>
+        <div id="userList" class="pb-24"></div>
     </div>
 
-    <div id="reportModal" class="modal">
-        <div class="bg-[#0a0a0a] w-[85%] max-w-xs p-6 rounded-[2.5rem] border border-gray-800 shadow-2xl">
-            <h3 class="text-center font-bold text-orange-500 mb-6 tracking-widest uppercase text-xs">Send Report</h3>
+    <div id="reportModal" class="modal" onclick="if(event.target==this) closeReportModal()">
+        <div class="bg-[#0a0a0a] w-[80%] p-6 rounded-[2rem] border border-gray-800">
+            <h3 class="text-center font-bold text-orange-500 mb-5 text-sm uppercase">Send Telegram Report</h3>
             <div class="space-y-3">
-                <button onclick="sendBulkReport('all')" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold text-sm italic">সবাইকে পাঠান</button>
-                <button onclick="sendBulkReport('due')" class="w-full bg-rose-600 text-white p-4 rounded-2xl font-bold text-sm italic">বাকীদের তালিকা</button>
-                <button onclick="sendBulkReport('paid')" class="w-full bg-emerald-600 text-white p-4 rounded-2xl font-bold text-sm italic">সাকসেস তালিকা</button>
-                <button onclick="closeReportModal()" class="w-full p-2 text-gray-600 text-[10px] font-bold uppercase mt-2">ফিরে যান</button>
+                <button onclick="sendBulkReport('all')" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold text-sm">সবাইকে পাঠান</button>
+                <button onclick="sendBulkReport('due')" class="w-full bg-rose-600 text-white p-4 rounded-xl font-bold text-sm">বাকি তালিকা পাঠান</button>
+                <button onclick="sendBulkReport('paid')" class="w-full bg-emerald-600 text-white p-4 rounded-xl font-bold text-sm">সাকসেস তালিকা পাঠান</button>
             </div>
         </div>
     </div>
 
-    <div id="actionModal" class="modal">
-        <div class="bg-[#0a0a0a] w-[85%] max-w-xs p-6 rounded-[2.5rem] border border-gray-800 shadow-2xl">
-            <div class="text-center mb-8">
-                <h3 id="targetName" class="text-lg font-bold text-white italic">নাম</h3>
-                <div class="w-12 h-1 bg-blue-600 mx-auto mt-2 rounded-full"></div>
-            </div>
-            <button onclick="confirmDeleteUser()" class="w-full bg-rose-950/20 text-rose-500 p-4 rounded-2xl font-bold text-[10px] uppercase mb-6 border border-rose-900/30">🗑 ডিলিট</button>
+    <div id="actionModal" class="modal" onclick="if(event.target==this) closeActionModal()">
+        <div class="bg-[#0a0a0a] w-[80%] p-6 rounded-[2rem] border border-gray-800">
+            <h3 id="targetName" class="text-center text-lg font-bold text-white mb-6 italic">নাম</h3>
             <div class="space-y-3">
-                <button id="statusActionBtn" onclick="handleStatusToggle()" class="w-full bg-emerald-600 text-white p-4 rounded-2xl font-bold text-sm">বিল সাকসেস</button>
-                <button onclick="handleEditClick()" class="w-full bg-gray-900 text-white p-4 rounded-2xl font-bold text-sm border border-gray-800">নাম পরিবর্তন</button>
-                <button onclick="closeActionModal()" class="w-full p-2 text-gray-600 text-[10px] font-bold uppercase mt-2">ফিরে যান</button>
+                <button id="statusActionBtn" onclick="handleStatusToggle()" class="w-full bg-emerald-600 text-white p-4 rounded-xl font-bold">বিল সাকসেস</button>
+                <button onclick="handleEditClick()" class="w-full bg-gray-800 text-white p-4 rounded-xl font-bold">নাম পরিবর্তন</button>
+                <button onclick="confirmDeleteUser()" class="w-full text-rose-500 p-2 font-bold text-xs uppercase mt-2">🗑 ইউজার ডিলিট</button>
             </div>
         </div>
     </div>
 
     <div id="dataModal" class="modal">
-        <div class="bg-[#0a0a0a] w-[90%] max-w-sm p-8 rounded-[3rem] border border-gray-800">
-            <h3 id="modalTitle" class="text-lg font-bold mb-8 text-center text-blue-500 uppercase italic">Add User</h3>
-            <input type="hidden" id="editId">
-            <div class="space-y-6">
-                <input type="text" id="userName" placeholder="নাম লিখুন..." class="w-full p-5 bg-black border border-gray-800 rounded-2xl outline-none text-center text-white text-lg">
-                <button onclick="saveUser()" class="w-full bg-white text-black p-5 rounded-2xl font-black text-sm uppercase">সেভ করুন</button>
-                <button onclick="closeDataModal()" class="w-full text-gray-600 font-bold text-[10px] uppercase">বাতিল</button>
-            </div>
+        <div class="bg-[#0a0a0a] w-[85%] p-8 rounded-[2rem] border border-gray-800">
+            <input type="text" id="userName" placeholder="নাম লিখুন..." class="w-full p-4 bg-black border border-gray-800 rounded-xl text-center text-white mb-4">
+            <button onclick="saveUser()" class="w-full bg-white text-black p-4 rounded-xl font-black uppercase">সেভ করুন</button>
         </div>
     </div>
 
@@ -93,26 +84,19 @@
         const BOT_TOKEN = "7885791804:AAHQjsAsMuBfvVqWga0hub2m0QZ7BrgsAsc"; 
         const CHAT_ID = "5923885908";     
 
-        // ডিফল্ট ডাটা হিসেবে আপনার দেওয়া নামগুলো
-        const initialNames = ["কাজল", "সুনীল", "শাওন", "ফরিদ", "আইয়ুব", "পারভেজ ১", "দিপু", "শান্তি", "আলামিন", "মিজান", "আনোয়ার", "রোকন", "শাহাবুদ্দিন", "জনি", "অফিস", "রাফিন", "দুর্জয়", "সাইফা", "জেরিন", "মাহাদি", "রিদয় ১", "মোবারক", "ইমন ১", "ইমরান", "মোবারক ২", "রিদয়", " canন্দ", "ইয়াকুব", "নাবিল", "জাকির ২", "সাগর", "শাকিল ৩", "রুস্তম", "হাশেম", "আশরাফুল", "দীপ্ত", "হামিদুল", "আজাহার ১", "নবাব", "বিজয়", "নজরুল", "মোতালেব", "এস কে মানিক", "আজাহার", "কাশেম আমিরুল", "রতন ১", "সপ্না", "বাদল", "রাফেজা", "রেজাউল", "সিয়াম", "মাসুদ", "আলামিন ১", "মঞ্জু ১", "সারোয়ার", "সোহেল", "ঝুমা ১", "জসিম ১", "রোকেয়া", "সুমন ২", "মোফাজ্জল ১", "মোফাজ্জল ০", "রায়হান", "পলাশ", "মালেক", "মুরাদ", "সিয়াম ২", "জুয়েল ১", "মোজাম", "সাব্বির", "আরাফাত", "জাকির", "গোলাম মোস্তফা", "জুলহাস", "উজ্জল", "সুমন", "জাহাঙ্গীর ১", "খায়রুল ১", "কাকন", "শাকিল ২", "হাবিবুল্লাহ", "আজিজ", "নজরুল", "হাসান", "মাহি", "মাই", "রুপা", "সবুজ", "সুমন ১", "হবি", "আলামিন ২", "সাদমান", "সোহেল ৪", "হালিম", "মঞ্জু", "নুর ইসলাম", "আজহারুল", "ফরহাদ", "ফরহাদ ১", "সেলিম", "লিয়াকত", "জহিরুল", "তানভীর", "রিফাত ৩", "ইমন", "আশিকুর", "সিয়াম", "সোনিয়া ২", "সিদ্দিক", "জাহাঙ্গীর", "জুবায়ের", "পরান", "সেলিম ভাই", "মুয়াজ", "শাহীন ১", "নুরুল আমিন", "অনিক", "দুলাল", "রাজু", "হুমায়ুন", "রিদয়", "মনির", "মোশারফ", "সোনিয়া", "সাকিবুল", "শান্ত ২", "রুবেল", "পারভেজ", "পলাশ", "মাসুদ ১", "সুমন ২", "শহীদুল্লাহ", "রিফাত বিলা", "রমজান", "রিদওয়ান", "আলমগীর", "ফারুক ১", "মানিক", "ফাহিম", "রাসেল", "রিমন", "শাহানাজ", "হিরন", "সাহানাজ", "আবুবক্কর", "বিলকিস", "জুমা", "মুসেদ", "ডিকে নাহিদ", "রমা", "সুহেল", "রাকিব", "ফারুক ২", "রফিকুল", "নাসরিন", "সুজন", "রহিম", "অপু", "শফিকুল", "মিল্লাত", "রতন", "হেলাল", "আনোয়ার আদিবা", "আসিফ", "শফিকুল", "আজিমউদ্দিন", "কাউসার", "জসিম", "আসাদুল", "মুজিবর", "রিদয়", "আসাদ", "অরুণ", "শরিফুল", "খোঁজরুল আলম", "শফিকুল ১", "হারুন", "রাব্বি ১", "জামাল", "রাব্বি ২", "মারুফ", "রাসেল ৩", "মিনা", "জালাল", "দুলাল", "হান্নান ১", "এমদাদুল", "মোকসেদুল", "ফারুক", "জুয়েল", "আলম ১", "নাঈম", "নাদিয়া", "আজগর", "রশিদ", "রাসেল", "তানা হামিদ", "কালাম", "শুভ", "হুমায়ুন", "মুকুল", "মিজান", "পারভেজ", "মিম", "আলম", "হিশাম", "দেলোয়ার", "উজ্জল", "রফিক ১", "イসমাইল", "আনিস", "রুনু", "মামুন ১", "জান্নাত", "মঞ্জু ১", "মনির", "রোজা", "কামরুল", "মনির ২", "জাকির ৩", "মুক্তা", "সোহাগ", "আরিফ", "তুহিন", "মোবারক ৩", "ফারুক", "পলাশ", "মমিদুল", "রিপন", "রোকন", "আসিফ ১", "সুমন", "খালেক", "মরিয়ম", "রাজিব", "শাহীন", "তামিম", "শিপন", "বিপ্লব", "আল রাজি", "রাব্বি ১", "রোজা", "রিয়াদ", "সোহেল", "শফিকুল ১", "রিদয়২", "নাঈম", "খাইরুল ২", "মনির", "মোশারফ ১", "সপ্না", "কাফি", "শরিফুল ১", "মর্জিনা", "আলিম", "রাশেদ", "জসিম ২", "সুলতানা", "শামীম", "আলিম", "মুস্তাফিজুর", "মিরাজ", "সুমন", "মাহাদি", "আলামিন", "শুভ", "পিয়াল", "পিয়াল", "রাব্বি", "রোহান", "রফিক", "ইয়াসিন", "সোহেল", "অন্তর", "জহির মামা", "বাবলু", "জয়"];
-
-        let users = JSON.parse(localStorage.getItem('billingFinalV13'));
-        
-        // প্রথমবার ওপেন করলে ডাটা লোড হবে
-        if (!users) {
-            users = initialNames.map((name, index) => ({
-                id: Date.now() + index,
-                name: name,
-                isPaid: false
-            }));
-            localStorage.setItem('billingFinalV13', JSON.stringify(users));
-        }
-
+        // ডাটাবেজ হ্যান্ডলিং
+        let users = JSON.parse(localStorage.getItem('billingFinalV14')) || [];
         let currentTab = 'all';
         let activeUserId = null;
         let holdTimer;
 
-        // [আগের সব ফাংশন - sendBulkReport, switchTab, renderData ইত্যাদি এখানে থাকবে]
+        // টেলিগ্রামে মেসেজ পাঠানোর মূল ফাংশন
+        async function sendToTelegram(message) {
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
+            try { await fetch(url); } catch (e) { console.error("Telegram Send Failed"); }
+        }
+
+        // বাল্ক রিপোর্ট
         async function sendBulkReport(type) {
             const date = new Date().toLocaleDateString('bn-BD');
             let list = [];
@@ -121,14 +105,14 @@
             else if(type === 'due') { list = users.filter(u => !u.isPaid); title = "🔴 বাকি তালিকা"; } 
             else if(type === 'paid') { list = users.filter(u => u.isPaid); title = "🟢 সাকসেস তালিকা"; }
 
-            let nameList = list.map((u, i) => `${i+1}. ${u.name}`).join('\n');
+            if(list.length === 0) return alert("তালিকা খালি!");
+            
+            let nameList = list.slice(0, 100).map((u, i) => `${i+1}. ${u.name}`).join('\n'); // লিমিট ১০০ জন মেসেজ লেন্থের জন্য
             const text = `📢 *${title}*\n📅 তারিখ: ${date}\n\n${nameList}\n\n📊 মোট: ${list.length} জন`;
-            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
-            try { await fetch(url); alert("পাঠানো হয়েছে!"); closeReportModal(); } catch (e) { alert("ত্রুটি!"); }
+            await sendToTelegram(text);
+            alert("টেলিগ্রামে পাঠানো হয়েছে!");
+            closeReportModal();
         }
-
-        function openReportModal() { document.getElementById('reportModal').classList.add('active-modal'); }
-        function closeReportModal() { document.getElementById('reportModal').classList.remove('active-modal'); }
 
         function switchTab(tab) {
             currentTab = tab;
@@ -137,33 +121,83 @@
             renderData();
         }
 
-        function onTouchStart(id, isPaid) {
+        // টাচ কন্ট্রোল
+        function onTouchStart(id) {
             activeUserId = id;
             holdTimer = setTimeout(() => {
                 const user = users.find(u => u.id === id);
                 document.getElementById('targetName').innerText = user.name;
                 document.getElementById('statusActionBtn').innerText = user.isPaid ? "আবার বাকি করুন" : "বিল সাকসেস";
                 document.getElementById('actionModal').classList.add('active-modal');
-                if ('vibrate' in navigator) navigator.vibrate(80);
-            }, 800);
+                if(navigator.vibrate) navigator.vibrate(50);
+            }, 600);
         }
 
         function onTouchEnd() { clearTimeout(holdTimer); }
-        function closeActionModal() { document.getElementById('actionModal').classList.remove('active-modal'); }
 
-        function handleStatusToggle() {
+        // স্ট্যাটাস পরিবর্তন ও টেলিগ্রাম
+        async function handleStatusToggle() {
             const user = users.find(u => u.id === activeUserId);
-            users = users.map(u => u.id === activeUserId ? {...u, isPaid: !u.isPaid} : u);
+            const newStatus = !user.isPaid;
+            users = users.map(u => u.id === activeUserId ? {...u, isPaid: newStatus} : u);
             saveAndRender();
             closeActionModal();
+
+            if (newStatus) {
+                const date = new Date().toLocaleDateString('bn-BD');
+                await sendToTelegram(`✅ *বিল সাকসেস*\n👤 নাম: ${user.name}\n📅 তারিখ: ${date}`);
+            }
         }
 
-        function handleEditClick() {
-            const user = users.find(u => u.id === activeUserId);
-            document.getElementById('editId').value = user.id;
-            document.getElementById('userName').value = user.name;
-            closeActionModal();
-            document.getElementById('dataModal').classList.add('active-modal');
+        // কমন ফাংশনস
+        function saveAndRender() {
+            localStorage.setItem('billingFinalV14', JSON.stringify(users));
+            renderData();
+        }
+
+        function renderData() {
+            const listDiv = document.getElementById('userList');
+            let filtered = users;
+            if (currentTab === 'due') filtered = users.filter(u => !u.isPaid);
+            if (currentTab === 'paid') filtered = users.filter(u => u.isPaid);
+
+            // ফ্র্যাগমেন্ট ব্যবহার করে ফাস্ট রেন্ডারিং
+            let html = '';
+            filtered.forEach((u, index) => {
+                html += `
+                    <div class="user-card p-5 flex justify-between items-center" 
+                         onmousedown="onTouchStart(${u.id})" onmouseup="onTouchEnd()" 
+                         ontouchstart="onTouchStart(${u.id})" ontouchend="onTouchEnd()">
+                        ${u.isPaid ? '<div class="success-tag">Success</div>' : ''}
+                        <div class="flex items-center">
+                            <span class="user-serial">${index + 1}.</span>
+                            <h4 class="user-name-text ${u.isPaid ? 'opacity-30 line-through' : ''}">${u.name}</h4>
+                        </div>
+                        <div class="w-2 h-2 rounded-full ${u.isPaid ? 'bg-emerald-500' : 'bg-rose-600'}"></div>
+                    </div>`;
+            });
+            listDiv.innerHTML = html;
+
+            // কাউন্টার আপডেট
+            document.getElementById('totalCount').innerText = users.length;
+            document.getElementById('paidCount').innerText = users.filter(u => u.isPaid).length;
+            document.getElementById('dueCount').innerText = users.filter(u => !u.isPaid).length;
+        }
+
+        // মোডাল কন্ট্রোল
+        function openAddModal() { document.getElementById('dataModal').classList.add('active-modal'); }
+        function closeDataModal() { document.getElementById('dataModal').classList.remove('active-modal'); }
+        function closeActionModal() { document.getElementById('actionModal').classList.remove('active-modal'); }
+        function openReportModal() { document.getElementById('reportModal').classList.add('active-modal'); }
+        function closeReportModal() { document.getElementById('reportModal').classList.remove('active-modal'); }
+
+        function saveUser() {
+            const name = document.getElementById('userName').value.trim();
+            if(!name) return;
+            users.unshift({ id: Date.now(), name, isPaid: false });
+            saveAndRender();
+            closeDataModal();
+            document.getElementById('userName').value = '';
         }
 
         function confirmDeleteUser() {
@@ -172,55 +206,6 @@
                 saveAndRender();
                 closeActionModal();
             }
-        }
-
-        function openAddModal() {
-            document.getElementById('editId').value = "";
-            document.getElementById('userName').value = "";
-            document.getElementById('dataModal').classList.add('active-modal');
-        }
-
-        function closeDataModal() { document.getElementById('dataModal').classList.remove('active-modal'); }
-
-        function saveUser() {
-            const id = document.getElementById('editId').value;
-            const name = document.getElementById('userName').value.trim();
-            if(!name) return;
-            if(id) { users = users.map(u => u.id == id ? {...u, name} : u); }
-            else { users.unshift({ id: Date.now(), name, isPaid: false }); }
-            saveAndRender();
-            closeDataModal();
-        }
-
-        function saveAndRender() {
-            localStorage.setItem('billingFinalV13', JSON.stringify(users));
-            renderData();
-        }
-
-        function renderData() {
-            const list = document.getElementById('userList');
-            list.innerHTML = '';
-            let filtered = users;
-            if (currentTab === 'due') filtered = users.filter(u => !u.isPaid);
-            if (currentTab === 'paid') filtered = users.filter(u => u.isPaid);
-
-            filtered.forEach((u, index) => {
-                list.innerHTML += `
-                    <div class="user-card p-6 flex justify-between items-center" 
-                         onmousedown="onTouchStart(${u.id}, ${u.isPaid})" onmouseup="onTouchEnd()" 
-                         ontouchstart="onTouchStart(${u.id}, ${u.isPaid})" ontouchend="onTouchEnd()">
-                        ${u.isPaid ? '<div class="success-tag">Success Bill</div>' : ''}
-                        <div class="flex items-center">
-                            <span class="user-serial">${index + 1}.</span>
-                            <h4 class="user-name-text ${u.isPaid ? 'opacity-30 line-through' : ''}">${u.name}</h4>
-                        </div>
-                        <div class="w-2.5 h-2.5 rounded-full ${u.isPaid ? 'bg-emerald-500 shadow-[0_0_12px_#10b981]' : 'bg-rose-600'}"></div>
-                    </div>
-                `;
-            });
-            document.getElementById('totalCount').innerText = users.length;
-            document.getElementById('paidCount').innerText = users.filter(u => u.isPaid).length;
-            document.getElementById('dueCount').innerText = users.filter(u => !u.isPaid).length;
         }
 
         window.onload = renderData;
