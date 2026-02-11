@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ListerPro - Ultra Sync & Secure</title>
+    <title>ListerPro - Ultra Secure V8</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background: #000; color: #fff; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -27,7 +27,7 @@
 </head>
 <body>
 
-    <div id="syncStatus" class="bg-blue-600 text-white font-bold shadow-lg"></div>
+    <div id="syncStatus" class="bg-blue-600 text-white font-bold"></div>
 
     <div id="loginOverlay">
         <div class="login-card">
@@ -43,11 +43,11 @@
 
     <div id="passVerifyModal" class="modal">
         <div class="pass-card">
-            <h2 id="verifyTitle" class="text-white font-black text-xl mb-4 italic uppercase">ভেরিফাই করুন</h2>
+            <h2 id="verifyTitle" class="text-white font-black text-xl mb-4 italic">ভেরিফাই</h2>
             <input type="password" id="universalPass" class="w-full bg-zinc-900 p-4 rounded-2xl text-center text-white text-2xl tracking-[8px] outline-none mb-6 border border-zinc-800" placeholder="••••" maxlength="8">
             <div class="flex gap-4">
-                <button onclick="closeVerifyModal()" class="w-1/2 bg-zinc-800 py-4 rounded-2xl font-bold text-xs">বাতিল</button>
-                <button onclick="executeVerifiedAction()" class="w-1/2 bg-blue-600 py-4 rounded-2xl font-bold text-xs">কনফার্ম</button>
+                <button onclick="closeVerifyModal()" class="w-1/2 bg-zinc-800 py-4 rounded-2xl font-bold">বাতিল</button>
+                <button onclick="executeVerifiedAction()" class="w-1/2 bg-blue-600 py-4 rounded-2xl font-bold">কনফার্ম</button>
             </div>
         </div>
     </div>
@@ -62,7 +62,7 @@
                 
                 <div class="flex justify-between items-center mb-6 px-2">
                     <h1 class="text-2xl font-black italic text-blue-600">LISTER<span class="text-white">PRO</span></h1>
-                    <button onclick="openAddModal()" class="w-12 h-12 bg-white text-black rounded-full font-bold text-3xl shadow-lg">+</button>
+                    <button onclick="openAddModal()" class="w-12 h-12 bg-white text-black rounded-full font-bold text-3xl">+</button>
                 </div>
 
                 <div class="grid grid-cols-3 gap-3 text-center mb-6">
@@ -78,7 +78,6 @@
                     <button onclick="openReportModal()" class="tab-btn text-orange-500">REPORT 📢</button>
                 </div>
             </div>
-
             <div id="userList" class="pb-32 mt-4"></div>
         </div>
     </div>
@@ -89,26 +88,20 @@
             <h3 id="targetName" class="text-center text-xl font-bold mb-8 italic text-blue-400">নাম</h3>
             <div class="space-y-4">
                 <button onclick="askUniversalPass('delete')" class="w-full bg-rose-950/20 text-rose-500 p-5 rounded-2xl font-bold border border-rose-900/30 uppercase text-[10px]">🗑 ডিলিট ইউজার</button>
-                <button id="statusActionBtn" onclick="askUniversalPass('toggle_status')" class="w-full bg-emerald-600 text-white p-5 rounded-2xl font-bold text-lg">বিল সাকসেস</button>
-                <button onclick="handleEditClick()" class="w-full bg-gray-900 text-white p-5 rounded-2xl font-bold border border-gray-800">এডিট</button>
+                <button id="statusActionBtn" onclick="askUniversalPass('toggle_status')" class="w-full bg-emerald-600 text-white p-5 rounded-2xl font-bold text-lg">সাকসেস করুন</button>
+                <button onclick="handleEditClick()" class="w-full bg-gray-900 text-white p-5 rounded-2xl font-bold border border-gray-800">নাম এডিট</button>
             </div>
         </div>
     </div>
 
-    <div id="dataModal" class="modal">
-        <div class="bg-[#080808] w-[88%] p-8 rounded-[3rem] border border-zinc-800">
-            <input type="hidden" id="editId">
-            <input type="text" id="userNameInput" placeholder="নাম..." class="w-full p-5 bg-black border border-zinc-800 rounded-2xl text-center text-white mb-6 outline-none">
-            <button onclick="saveUser()" class="w-full bg-white text-black p-5 rounded-2xl font-black uppercase tracking-widest">সেভ</button>
-        </div>
-    </div>
-
-    <div id="reportModal" class="modal" onclick="if(event.target==this) closeReportModal()">
+    <div id="reportModal" class="modal">
         <div class="bg-[#080808] w-[85%] p-8 rounded-[3rem] border border-gray-800">
+            <h2 class="text-center font-bold mb-6 text-orange-500">টেলিগ্রামে রিপোর্ট পাঠান</h2>
             <div class="space-y-4">
-                <button onclick="sendBulkReport('all')" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-bold">সবাইকে পাঠান</button>
-                <button onclick="sendBulkReport('due')" class="w-full bg-rose-600 text-white p-5 rounded-2xl font-bold">বাকি তালিকা</button>
-                <button onclick="sendBulkReport('paid')" class="w-full bg-emerald-600 text-white p-5 rounded-2xl font-bold">সাকসেস তালিকা</button>
+                <button onclick="sendReport('all')" class="w-full bg-blue-600 p-5 rounded-2xl font-bold">সকল লিস্ট</button>
+                <button onclick="sendReport('due')" class="w-full bg-rose-600 p-5 rounded-2xl font-bold">বাকি লিস্ট</button>
+                <button onclick="sendReport('paid')" class="w-full bg-emerald-600 p-5 rounded-2xl font-bold">সাকসেস লিস্ট</button>
+                <button onclick="closeReportModal()" class="w-full text-zinc-500 text-xs mt-4">বন্ধ করুন</button>
             </div>
         </div>
     </div>
@@ -118,32 +111,29 @@
         const BOT_TOKEN = "7885791804:AAHQjsAsMuBfvVqWga0hub2m0QZ7BrgsAsc"; 
         const CHAT_ID = "5923885908";
 
+        // ২৭৯ নাম ডিফল্ট হিসেবে
         const defaultNames = ["কাজল","সুনীল","শাওন","ফরিদ","আইয়ুব","পারভেজ ১","দিপু","শান্তি","আলামিন","মিজান","আনোয়ার","রোকন","শাহাবুদ্দিন","জনি","অফিস","রাফিন","দুর্জয়","সাইফা","জেরিন","মাহাদি","রিদয় ১","মোবারক","ইমন ১","ইমরান","মোবারক ২","রিদয়","আনন্দ","ইয়াকুব","নাবিল","জাকির ২","সাগর","শাকিল ৩","রুস্তম","হাশেম","আশরাফুল","দীপ্ত","হামিদুল","আজাহার ১","নবাব","বিজয়","নজরুল","মোতালেব","এস কে মানিক","আজাহার","কাশেম আমিরুল","রতন ১","সপ্না","বাদল","রাফেজা","রেজাউল","সিয়াম","মাসুদ","আলামিন ১","মঞ্জু ১","সারোয়ার","সোহেল","ঝুমা ১","জসিম ১","রোকেয়া","সুমন ২","মোফাজ্জল ১","মোফাজ্জল ০","রায়হান","পলাশ","মালেক","মুরাদ","সিয়াম ২","জুয়েল ১","মোজাম","সাব্বির","আরাফাত","জাকির","গোলাম মোস্তফা","জুলহাস","উজ্জল","সুমন","জাহাঙ্গীর ১","খায়রুল ১","কাকন","শাকিল ২","হাবিবুল্লাহ","আজিজ","নজরুল","হাসান","মাহি","মাই","রুপা","সবুজ","সুমন ১","হবি","আলামিন ২","সাদমান","সোহেল ৪","হালিম","মঞ্জু","নুর ইসলাম","আজহারুল","ফরহাদ","ফরহাদ ১","সেলিম","লিয়াকত","জহিরুল","তানভীর","রিফাত ৩","ইমন","আশিকুর","সিয়াম","সোনিয়া ২","সিদ্দিক","জাহাঙ্গীর","জুবায়ের","পরান","সেলিম ভাই","মুয়াজ","শাহীন ১","নুরুল আমিন","অনিক","দুলাল","রাজু","হুমায়ুন","রিদয়","মনির","মোশারফ","সোনিয়া","সাকিবুল","শান্ত ২","রুবেল","পারভেজ","পলাশ","মাসুদ ১","সুমন ২","শহীদুল্লাহ","রিফাত বিলা","রমজান","রিদওয়ান","আলমগীর","ফারুক ১","মানিক","ফাহিম","রাসেল","রিমন","শাহানাজ","হিরন","সাহানাজ","আবুবক্কর","বিলকিস","জুমা","মুসেদ","ডিকে নাহিদ","রমা","সুহেল","রাকিব","ফারুক ২","রফিকুল","নাসরিন","সুজন","রহিম","অপু","শফিকুল","মিল্লাত","রতন","হেলাল","আনোয়ার আদিবা","আসিফ","শফিকুল","আজিমউদ্দিন","কাউসার","জসিম","আসাদুল","মুজিবর","রিদয়","আসাদ","অরুণ","শরিফুল","খোঁজরুল আলম","শফিকুল ১","হারুন","রাব্বি ১","জামাল","রাব্বি ২","মারুফ","রাসেল ৩","মিনা","জালাল","দুলাল","হান্নান ১","এমদাদুল","মোকসেদুল","ফারুক","জুয়েল","আলম ১","নাঈম","নাদিয়া","আজগর","রশিদ","রাসেল","তানা হামিদ","কালাম","শুভ","হুমায়ুন","মুকুল","মিজান","পারভেজ","মিম","আলম","হিশাম","দেলোয়ার","উজ্জল","রফিক ১","ইসমাইল","আনিস","রুনু","মামুন ১","জান্নাত","মঞ্জু ১","মনির","রোজা","কামরুল","মনির ২","জাকির ৩","মুক্তা","সোহাগ","আরিফ","তুহিন","মোবারক ৩","ফারুক","পলাশ","মমিদুল","রিপন","রোকন","আসিফ ১","সুমন","খালেক","মরিয়ম","রাজিব","শাহীন","তামিম","শিপন","বিপ্লব","আল রাজি","রাব্বি ১","রোজা","রিয়াদ","সোহেল","শফিকুল ১","রিদয়২","নাঈম","খাইরুল ২","মনির","মোশারফ ১","সপ্না","কাফি","শরিফুল ১","মর্জিনা","আলিম","রাশেদ","জসিম ২","সুলতানা","শামীম","আলিম","মুস্তাফিজুর","মিরাজ","সুমন","মাহাদি","আলামিন","শুভ","পিয়াল","পিয়াল","রাব্বি","রোহান","রফিক","ইয়াসিন","সোহেল","অন্টার","জহির মামা","বাবলু","জয়"];
 
-        let users = JSON.parse(localStorage.getItem('billingFinalV70')) || [];
+        let users = JSON.parse(localStorage.getItem('billingV80')) || [];
         if(users.length === 0) {
             users = defaultNames.map((n, i) => ({ id: Date.now() + i, name: n, isPaid: false }));
-            localStorage.setItem('billingFinalV70', JSON.stringify(users));
+            localStorage.setItem('billingV80', JSON.stringify(users));
         }
 
         let offlineQueue = JSON.parse(localStorage.getItem('offlineQueue')) || [];
         let activeUserId = null, holdTimer, currentTab = 'all', pendingAction = null;
 
+        // রিফ্রেশ করলে লগআউট করার জন্য সেশন ক্লিয়ার (লজিক: শুধু সেশনেই পাস থাকবে)
         function checkPass() {
             if(document.getElementById('passCode').value === PIN) {
-                sessionStorage.setItem('lister_auth', 'active');
-                unlock();
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+                renderData();
+                processQueue();
             } else { alert("ভুল পাসওয়ার্ড!"); }
         }
 
-        function unlock() {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('appContent').style.display = 'block';
-            renderData();
-            processQueue();
-        }
-
-        // অফলাইন সিঙ্ক এবং টেলিগ্রাম লজিক
+        // টেলিগ্রাম সিঙ্ক
         async function sendToTelegram(msg) {
             if (!navigator.onLine) {
                 offlineQueue.push({ msg, id: Date.now() });
@@ -173,17 +163,15 @@
 
         function updateSyncStatus() {
             const status = document.getElementById('syncStatus');
-            if (offlineQueue.length > 0) {
-                status.style.display = 'block';
-                status.innerText = `${offlineQueue.length}টি ডাটা সিঙ্ক হচ্ছে...`;
-            } else { status.style.display = 'none'; }
+            status.style.display = (offlineQueue.length > 0) ? 'block' : 'none';
+            status.innerText = `${offlineQueue.length}টি ডাটা সিঙ্ক হচ্ছে...`;
         }
 
-        // সিকিউরিটি ভেরিফিকেশন
+        // অ্যাকশন ম্যানেজমেন্ট
         function askUniversalPass(action) {
             pendingAction = action;
             closeActionModal();
-            document.getElementById('verifyTitle').innerText = action === 'reset_all' ? "সব বাকি করুন?" : "ভেরিফাই করুন";
+            document.getElementById('verifyTitle').innerText = action === 'reset_all' ? "সব বাকি করবেন?" : "পাসওয়ার্ড দিন";
             document.getElementById('passVerifyModal').classList.add('active-modal');
             document.getElementById('universalPass').focus();
         }
@@ -204,7 +192,27 @@
             } else { alert("ভুল পাসওয়ার্ড!"); }
         }
 
-        // রেন্ডার এবং সুইচ
+        // রিপোর্ট ফাংশন (ফিক্সড)
+        async function sendReport(type) {
+            let list = (type === 'all') ? users : (type === 'due') ? users.filter(u => !u.isPaid) : users.filter(u => u.isPaid);
+            if(list.length === 0) return alert("লিস্ট খালি!");
+            
+            const title = type === 'all' ? "সকল লিস্ট" : type === 'due' ? "বাকি লিস্ট" : "সাকসেস লিস্ট";
+            let text = `📢 *${title}*\n\n`;
+            
+            for (let i = 0; i < list.length; i++) {
+                text += `${i + 1}. ${list[i].name}\n`;
+                if ((i + 1) % 50 === 0 || i === list.length - 1) {
+                    await sendToTelegram(text);
+                    text = ""; // রিসেট ফর নেক্সট চাঙ্ক
+                    await new Promise(r => setTimeout(r, 500));
+                }
+            }
+            alert("টেলিগ্রামে পাঠানো হয়েছে!");
+            closeReportModal();
+        }
+
+        // UI রেন্ডারিং
         function renderData() {
             const listDiv = document.getElementById('userList');
             const searchVal = document.getElementById('searchInput').value.toLowerCase();
@@ -237,48 +245,19 @@
                 document.getElementById('targetName').innerText = user.name;
                 document.getElementById('statusActionBtn').innerText = user.isPaid ? "বাকি করুন" : "সাকসেস করুন";
                 document.getElementById('actionModal').classList.add('active-modal');
-                if(navigator.vibrate) navigator.vibrate(50);
                 loader.remove();
             }, 1500);
         }
 
         function onTouchEnd(element) { clearTimeout(holdTimer); if(element.querySelector('.pressing')) element.querySelector('.pressing').remove(); }
-        function saveAndRender() { localStorage.setItem('billingFinalV70', JSON.stringify(users)); renderData(); }
+        function saveAndRender() { localStorage.setItem('billingV80', JSON.stringify(users)); renderData(); }
+        function switchTab(t) { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); document.getElementById('bulkResetBtn').style.display = (t === 'paid') ? 'block' : 'none'; renderData(); }
         function closeVerifyModal() { document.getElementById('passVerifyModal').classList.remove('active-modal'); document.getElementById('universalPass').value = ''; }
         function closeActionModal() { document.getElementById('actionModal').classList.remove('active-modal'); }
-        function switchTab(t) { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); document.getElementById('bulkResetBtn').style.display = (t === 'paid') ? 'block' : 'none'; renderData(); }
+        function openReportModal() { document.getElementById('reportModal').classList.add('active-modal'); }
+        function closeReportModal() { document.getElementById('reportModal').classList.remove('active-modal'); }
         
-        async function sendBulkReport(type) {
-            let list = (type === 'all') ? users : (type === 'due') ? users.filter(u => !u.isPaid) : users.filter(u => u.isPaid);
-            for (let i = 0; i < list.length; i += 50) {
-                const chunk = list.slice(i, i + 50);
-                let text = `📢 *রিপোর্ট (${type})*\n\n` + chunk.map((u, idx) => `${i + idx + 1}. ${u.name}`).join('\n');
-                await sendToTelegram(text);
-            }
-            alert("টেলিগ্রামে রিপোর্ট পাঠানো হয়েছে!");
-        }
-
-        function openAddModal() { document.getElementById('editId').value=""; document.getElementById('userNameInput').value=""; document.getElementById('dataModal').classList.add('active-modal'); }
-        function closeDataModal() { document.getElementById('dataModal').classList.remove('active-modal'); }
-        function handleEditClick() { 
-            const user = users.find(u => u.id === activeUserId);
-            document.getElementById('editId').value = user.id;
-            document.getElementById('userNameInput').value = user.name;
-            closeActionModal();
-            document.getElementById('dataModal').classList.add('active-modal');
-        }
-        function saveUser() {
-            const name = document.getElementById('userNameInput').value.trim();
-            const id = document.getElementById('editId').value;
-            if(!name) return;
-            if(id) users = users.map(u => u.id == id ? {...u, name} : u);
-            else users.unshift({id: Date.now(), name, isPaid: false});
-            saveAndRender();
-            closeDataModal();
-        }
-
         window.addEventListener('online', processQueue);
-        window.onload = () => { if(sessionStorage.getItem('lister_auth') === 'active') unlock(); updateSyncStatus(); };
     </script>
 </body>
 </html>
